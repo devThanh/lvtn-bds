@@ -13,7 +13,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:8080/user/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
       const user = await User.findOneBy({email:profile.emails[0].value, type:'GG'})
@@ -68,7 +68,7 @@ passport.deserializeUser(function(user, done){
 // FACEBOOK LOGIN
 const facebook_key = process.env.FACEBOOK_KEY
 const facebook_secret = process.env.FACEBOOK_SECRET
-const facebook_callback_url = 'http://localhost:8080/user/facebook/callback'
+const facebook_callback_url = process.env.FACEBOOK_CALLBACK_URL
 passport.use(new FacebookStrategy({
   clientID: facebook_key,
   clientSecret: facebook_secret ,
