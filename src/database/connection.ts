@@ -14,11 +14,11 @@ import { Liked } from "../modules/comment/entities/like.model"
 export class ConnectDB {
     static AppDataSource = new DataSource({
         type: 'postgres',
-        host: 'localhost',
+        host: process.env.DB_HOST,
         port: 5432,
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
-        database: process.env.DB_NAME || 'lvtn',
+        database: process.env.DB_NAME,
         entities: [User, Admin, News, Real_Easte_News, Category, Info_Real_Easte, Image_Real_Easte, Payment, Comment, Liked],
         logging: false,
         synchronize: true,
