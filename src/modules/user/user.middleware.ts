@@ -6,6 +6,7 @@ import { UserLogin } from "./dto/loginUser.dto";
 import { UpdateProfileUser } from "./dto/updateProfileUser.dto";
 import { ChangePass } from "./dto/changePass.dto";
 import { AuthRequest } from "../auth/auth.middleware";
+import { AdminDTO } from "./dto/admin.dto";
 
 
 
@@ -82,5 +83,21 @@ export class UserMiddleware{
               next()
             }
           });
+    }
+
+    validateAdmin =async (req: AuthRequest, res: Response, next: NextFunction) => {
+      let admin = new AdminDTO()
+      admin.email = req.body.email
+      admin.password = req.body.password
+      validate(admin).then(errors => {
+        // errors is an array of validation errors
+        if (errors.length > 0) {
+          console.log('validation failed. errors: ', errors);
+          return res.send(new ResponseWrapper({message:"validation failed. errors: ", errors}))
+        } else {
+          console.log('validation succeed');
+          next()
+        }
+      });
     }
 }

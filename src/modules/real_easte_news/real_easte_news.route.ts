@@ -26,8 +26,10 @@ realEasteRouter.delete('/delete/:id', authMiddleware.authorize, realEasteNewsCon
 realEasteRouter.put('/hidden/:id', authMiddleware.authorize, realEasteNewsController.hiddenRealEasteNews)
 realEasteRouter.put('/edit/:id', authMiddleware.authorize, upload.single('thumbnail'), realEasteNewsMiddleware.validateEdit, realEasteNewsController.editRealEasteNews)
 realEasteRouter.post('/create', authMiddleware.authorize, upload.single('thumbnail'), realEasteNewsMiddleware.validatePost, realEasteNewsController.postRealEasteNews)
+realEasteRouter.post('/get-disapprove', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
+realEasteRouter.post('/get-news', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 
-categoryRouter.post('/create', realEasteNewsController.createCategory)
+categoryRouter.post('/create', realEasteNewsController.createCategory) ////
 categoryRouter.put('/edit/:id', realEasteNewsController.editCategory)
 categoryRouter.delete('/delete/:id', realEasteNewsController.deleteCategory)
 categoryRouter.get('/getall', realEasteNewsController.getAllCategory)

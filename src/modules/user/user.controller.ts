@@ -84,7 +84,25 @@ export class UserController{
 
    logout =async (req: Request, res: Response, next: NextFunction) => {
       try { req.session
-         const result = await this.userService.logout(req.body.email, req.body.password, req.session)
+         const result = await this.userService.logout(req.session)
+         res.send(new ResponseWrapper(result))
+      } catch (error) {
+         next(error)
+      }
+   }
+
+   loginAdmin =async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const result = await this.userService.loginAdmin(req.body.email, req.body.password)
+         res.send(new ResponseWrapper(result))
+      } catch (error) {
+         next(error)
+      }
+   }
+
+   createAdmin =async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const result = await this.userService.createAdmin(req.body.email, req.body.password)
          res.send(new ResponseWrapper(result))
       } catch (error) {
          next(error)

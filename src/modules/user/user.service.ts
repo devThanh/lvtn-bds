@@ -276,15 +276,15 @@ export class UserService implements BaseService{
 
     }
 
-    logout = async (email: string, password: string, session: Session) => {
-        //session.destroy
-        console.log(email,password)
-        //const admin = await Admin.findOneBy({email: email, password: password})
-        let admin = new Admin()
-        admin.email=email
-        admin.password=password
-        await admin.save()
-        return admin
+    logout = async (session: Session) => {
+        session.destroy
+        // console.log(email,password)
+        // //const admin = await Admin.findOneBy({email: email, password: password})
+        // let admin = new Admin()
+        // admin.email=email
+        // admin.password=password
+        // await admin.save()
+        // return admin
         // console.log(admin)
         // if(admin!==null){
         //     return admin
@@ -304,7 +304,16 @@ export class UserService implements BaseService{
                     redis_client.hSet( `${admin.email}:${`refresh-token`}`,refreshToken,1)
                     redis_client.expire(`${admin.email}:${`refresh-token`}`,7776000)
                     return {admin,accessToken: accessToken,refreshToken: refreshToken,}
-        }
+        }else throw Errors.BadRequest
+    }
+
+    createAdmin =async (email:string, password: string) => {
+        const admin = new Admin()
+        admin.email = email
+        admin.password = password
+        return await admin.save()
+        
+        
     }
 }
 

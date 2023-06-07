@@ -567,5 +567,27 @@ export class RealEasteNews implements BaseService{
 
     //lay tin k duyet chua lam NHO LAM
 
+    getDisapproveNews = async (email: string, page: number, limit: number) => {
+        const pagegination = new Pagination(page, limit)
+        const skip = pagegination.getOffset()
+        const admin = Admin.findOneBy({email: email})
+        if(admin!==null){
+            const data = Real_Easte_News.find({where:{status:'Disapprove'},skip:skip,take:limit})
+            console.log(data);
+            return data
+        }else throw Errors.Unauthorized
+    }
+
+    getNewsToApprove = async (email:string, page:number, limit: number) => {
+        const pagegination = new Pagination(page, limit)
+        const skip = pagegination.getOffset()
+        const admin = Admin.findOneBy({email: email})
+        if(admin!==null){
+            const data = Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
+            console.log(data);
+            return data
+        }else throw Errors.Unauthorized
+    }
+
 
 }
