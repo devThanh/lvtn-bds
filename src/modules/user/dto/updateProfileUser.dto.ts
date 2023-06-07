@@ -13,7 +13,7 @@ export class UpdateProfileUser{
 
     @Expose()
     @IsString()
-    fullname: string
+    fullName: string
 
     // @Expose()
     // @IsString()

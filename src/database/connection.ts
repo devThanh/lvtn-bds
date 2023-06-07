@@ -18,7 +18,7 @@ export class ConnectDB {
         port: 5432,
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
+        database: process.env.DB_NAME || 'lvtn',
         entities: [User, Admin, News, Real_Easte_News, Category, Info_Real_Easte, Image_Real_Easte, Payment, Comment, Liked],
         logging: false,
         synchronize: true,

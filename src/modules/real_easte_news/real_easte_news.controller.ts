@@ -97,6 +97,15 @@ export class RealEasteNewsController{
         }
     }
 
+    getAllCategory =async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.getAllCategory()
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     approveRealEasteNews =async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const result = await this.realEasteNewsService.approveRealEasteNews(req.params.id, req.email)
@@ -154,7 +163,7 @@ export class RealEasteNewsController{
 
     search = async (req: Request, res: Response, next: NextFunction) => {
         const page = Pagination.fromReq(req)
-        console.log('TTT: ',req.query);
+        //console.log('TTT: ',req.query);
         try {
             const result = await this.realEasteNewsService.searchRealEaste(req.query, page.page, page.limit)
             res.send(new ResponseWrapper(result))

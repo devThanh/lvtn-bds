@@ -6,6 +6,7 @@ import { ConnectDB } from './database/connection'
 import redis_client from '../redis_connect'
 import { userRouter } from './modules/user/user.route'
 require('dotenv').config()
+import cors from 'cors'
 import { newsRouter } from './modules/news/news.route'
 import cookieSession from "cookie-session";
 import './helpers/passport'
@@ -24,6 +25,14 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cors());
+// app.use(function (req, res, next) {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+//     res.setHeader('Access-Control-Allow-Credentials', 'true');
+//     next();});
+//app.use(cors({origin: '*'}))
 // app.use(
 //     cookieSession({
 //       maxAge: 24 * 60 * 60 * 1000,

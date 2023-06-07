@@ -1,0 +1,89 @@
+version: '3.1'
+
+services:
+    postgres:
+        image: postgres
+        container_name: postgres
+        #command: 
+        #     - --table_definition_cache=100
+        #     - --performance_schema=0
+        #    - --default-authentication-plugin=mysql_native_password
+        #     - --innodb_use_native_aio=0
+        restart: always
+        expose:
+            - 5432
+        environment:
+            - POSTGRES_PASSWORD=root
+            - POSTGRES_DB=lvtn
+            - POSTGRES_USER=postgres
+            # - MYSQL_ALLOW_EMPTY_PASSWORD=true
+            
+        ports:
+            - '5432:5432'
+        volumes:
+        #     # Mysql
+            - db_data:/var/lib/mysql
+        networks:
+            - lvtn
+
+    web:
+        image: node:16
+        env_file: ./.env
+        links: 
+            - postgres
+            - redis
+        depends_on:
+            - postgres
+            - redis
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - '8080:8080'
+        restart: unless-stopped
+        container_name: lvtn
+        environment:
+            - PORT=8888
+            - SMTP_USERNAME=vantranthanhh@gmail.com
+            - SMTP_PASSWORD=bovh mffy laak kdxb
+            - JWT_ACCESS_SECRECT=SECRECTKEY
+            - JWT_REFRESH_SECRECT=SECRECTKEY
+            - JWT_ACCESS_TIME=10m
+            - JWT_REFRESH_TIME=90d
+            - NODE_ENV=production
+            - REDIS_HOST=redis://redis:4466
+            - DB_USER=postgres
+            - DB_PASS=root
+            - DB_NAME=lvtn
+            - BUCKET_NAME=lvtn
+            - BUCKET_REGION=ap-southeast-1
+            -  ACCESS_KEY=AKIA6NN3SFYHGCBB4IW6
+            -  SECRET_ACCESS_KEY=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
+            -  GOOGLE_CLIENT_ID =786027060511-0oj3pkcb06sfjj2c0nuq86aino07fqdq.apps.googleusercontent.com
+            -  GOOGLE_CLIENT_SECRET =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
+            -  FACEBOOK_KEY = 1124601288178125
+            -  FACEBOOK_SECRET =f4f559d65928557d1f015604bd8a18dd
+            -  FACEBOOK_CALLBACK_URL=http://localhost:8888/user/facebook/callback
+            -  GEOCODER_PROVIDER=mapquest
+            -  GEOCODER_API_KEY=dU9gERUG6CzFbgMQTLIrRcKytu0HdwIn
+            -  vnp_TmnCode=KW5277XU
+            -  vnp_HashSecret=CVLPEOEEKKZBFCITYQOARWQZXNOVMYZX
+            -  vnp_Url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+            -  vnp_Api=https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+            -  vnp_ReturnUrl=http://localhost:8080/payment/vnpay_return
+        stdin_open: true
+        tty: true
+        networks:
+            - lvtn
+    redis:
+        image: 'redis/redis-stack:latest'
+        container_name: redis
+        ports:
+            - '6379:6379'
+        networks:
+            - lvtn
+volumes:
+    db_data:
+
+networks:
+    lvtn:

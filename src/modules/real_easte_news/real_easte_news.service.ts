@@ -25,6 +25,7 @@ import real_easte_newsProcedure from "./real_easte_news.procedure";
 import { SchemaFieldTypes } from "redis";
 import util from "../../util/util";
 import { Between, Like, getRepository } from "typeorm";
+import { title } from "process";
 moment.locale('vn')
 const dataSource = ConnectDB.AppDataSource
 
@@ -51,23 +52,24 @@ export class RealEasteNews implements BaseService{
             if(thumbnail!==undefined){
                 const filename = await bcrypt.generateFileName()
                 newsEaste.thumbnail = filename
-                // const bucketParams = {
-                //     Bucket: "lvtn-bds",
-                //     Key: filename,
-                //     Body: thumbnail.buffer
-                // };
-                // const data = await s3Client.send(new PutObjectCommand(bucketParams))
-                //     console.log(
-                //       "Successfully uploaded object: " +
-                //         bucketParams.Bucket +
-                //         "/" +
-                //         bucketParams.Key
-                //     );
+                const bucketParams = {
+                    Bucket: "lvtn-bds",
+                    Key: filename,
+                    Body: thumbnail.buffer
+                };
+                const data = await s3Client.send(new PutObjectCommand(bucketParams))
+                    console.log(
+                      "Successfully uploaded object: " +
+                        bucketParams.Bucket +
+                        "/" +
+                        bucketParams.Key
+                    );
+                    return await newsEaste.save()
             }else newsEaste.thumbnail = ''
             // redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             // redis_client.HSET(`${email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            
             return await newsEaste.save()
+            
         } catch (error) {
             console.log(error);
             throw Errors.BadRequest
@@ -94,20 +96,20 @@ export class RealEasteNews implements BaseService{
                 const user = await User.findOneBy({email:email, type: typeUser})
                 //newsEaste.user = user.id
                 if(thumbnail!==undefined){
-                    //const filename = await bcrypt.generateFileName()
-                    //newsEaste.thumbnail = filename
-                    // const bucketParams = {
-                    //     Bucket: "lvtn-bds",
-                    //     Key: newsEaste.thumbnail,
-                    //     Body: thumbnail.buffer
-                    // };
-                    // const data = await s3Client.send(new PutObjectCommand(bucketParams))
-                    //     console.log(
-                    //       "Successfully uploaded object: " +
-                    //         bucketParams.Bucket +
-                    //         "/" +
-                    //         bucketParams.Key
-                    //     );
+                    const filename = await bcrypt.generateFileName()
+                    result.thumbnail = filename
+                    const bucketParams = {
+                        Bucket: "lvtn-bds",
+                        Key: result.thumbnail,
+                        Body: thumbnail.buffer
+                    };
+                    const data = await s3Client.send(new PutObjectCommand(bucketParams))
+                        console.log(
+                          "Successfully uploaded object: " +
+                            bucketParams.Bucket +
+                            "/" +
+                            bucketParams.Key
+                        );
                 }
                 //redis_client.HSET(`${}`,``,``)
                 return await result.save()
@@ -204,13 +206,16 @@ export class RealEasteNews implements BaseService{
         // return res
         const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
-        const news = await Real_Easte_News.find({select:['id', 'title', 'content', 'thumbnail', 'slug'],
+        const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release'}, skip:skip, take: limit})
+        console.log('111',news);
         const res: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
+                //console.log("object");
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
                 const user = await User.findOneBy({id: element.user})
+                console.log('222',element.slug);
                 if(element.thumbnail!==''){
 
                     const imageName = element.thumbnail
@@ -235,15 +240,18 @@ export class RealEasteNews implements BaseService{
                         "city": info.city,
                         "email":user.email,
                         "phone":user.phone,
-                        "approve_date": element.approval_date
+                        "approve_date": element.approval_date,
+                        "slug": element.slug
                     }
+                    console.log(data);
                     //console.log(element)
                     //res.push(element)
                     res.push(data)
                 }
             })
         )
-        console.log(res)
+        
+        console.log('213 ',res)
         return res
     }
 
@@ -282,7 +290,8 @@ export class RealEasteNews implements BaseService{
                         "email":user.email,
                         "phone":user.phone,
                         "approve_date": element.approval_date,
-                        "name": user.fullname
+                        "name": user.fullname,
+                        "slug": element.slug
                     }
                     //console.log(element)
                     //res.push(element)
@@ -299,6 +308,7 @@ export class RealEasteNews implements BaseService{
     approveRealEasteNews = async (id: string, email: string) => {
         const news = await Real_Easte_News.findOneBy({id: id, status: ''})
         const admin = await Admin.findOneBy({email: email})
+        //const user
         if(admin!==null){
             if(news!==null){
                 news.status = 'Release'
@@ -309,49 +319,26 @@ export class RealEasteNews implements BaseService{
                 // const d = new Date(news.approval_date);
                 // const res = await addDay.addDay(d, Number(news.expiration))
                 // news.expiration_date =   moment(res).format('YYYY-MM-DD HH:mm:ss')
-                news.admin = email
+                news.admin = admin.id
                 await news.save()
                 
-                //const delays = Number(news.expiration)  * 60 * 60 * 24*1000
+                const delay = Number(news.expiration)  * 60 * 60 * 24*1000
                 //console.log(delays);10000
-                const delay = 60*30*1000
+                //const delay = 60*30*1000
                 await expirationRealEasteNews.add(
                     'expiration-real-easte-news',
                     { id: id },
                     { removeOnComplete: true, removeOnFail: true, delay:delay }
                 )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
-                redis_client.HSET(`${email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
-                // try {
-                //     redis_client.ft.create('idx:real-easte', {
-                //         title:{
-                //             type: SchemaFieldTypes.TEXT,
-                //             SORTABLE: true
-                //         },
-                //         // ward: SchemaFieldTypes.TEXT,
-                //         // district: SchemaFieldTypes.TEXT,
-                //         // city: SchemaFieldTypes.TEXT,               
-                //     },{
-                //         ON: 'JSON',
-                //         PREFIX: 'noderedis:real-easte'
-                //     })
-                // } catch (e) {
-                //     if (e.message === 'Index already exists') {
-                //         console.log('Index exists already, skipped creation.');
-                //       } else {
-                //         // Something went wrong, perhaps RediSearch isn't installed...
-                //         console.error(e);
-                //         process.exit(1);
-                //       }
-                // }
-                await redis_client.json.set(`noderedis:real-easte:${news.id}`,'$',{title:news.title})
+                redis_client.HSET(`admin-${admin.email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
             }else throw Errors.BadRequest
         }else throw Errors.Unauthorized
     }
 
 
     disapproveRealEasteNews = async (id: string, email: string) => {
-        const news = await Real_Easte_News.findOneBy({id: id})
+        const news = await Real_Easte_News.findOneBy({id: id, status:''})
         const admin = await Admin.findOneBy({email: email})
         if(admin!==null){
             if(news!==null){
@@ -422,6 +409,11 @@ export class RealEasteNews implements BaseService{
 
     }
 
+    getAllCategory =async () => {
+        const data = await Category.find({})
+        return data
+    }
+
     createInfoRealEaste = async (real_easte_id: string, acreage: number, price: number, status: string, number_bedrooms: number, number_bathrooms: number, number_floors: number, direction: string, balcony_direction: string, facade: number, road_width: number, interior: string, address: string, length: number, width: number, total_usable_area: string, ward: string, district: string ,city: string, images:any ) =>{
         const reNews = await Real_Easte_News.findOneBy({slug: real_easte_id})
         if(reNews!==null){
@@ -470,50 +462,18 @@ export class RealEasteNews implements BaseService{
                         Key: filename,
                         Body: item.buffer
                     }
+                    
+                    console.log('TTTT:  ',imageInfo);
+                    const data = await s3Client.send(new PutObjectCommand(bucketParams))
+                    console.log(
+                              "Successfully uploaded object: " +
+                                bucketParams.Bucket +
+                                "/" +
+                                bucketParams.Key
+                            )
                     await imageInfo.save()
-                    //console.log('TTTT:  ',imageInfo);
-                    // const data = await s3Client.send(new PutObjectCommand(bucketParams))
-                    // console.log(
-                    //           "Successfully uploaded object: " +
-                    //             bucketParams.Bucket +
-                    //             "/" +
-                    //             bucketParams.Key
-                    //         )
                 })
-            )
-            // try {
-            //     redis_client.ft.create('idx:real-easte-info', {
-            //         title:{
-            //             type: SchemaFieldTypes.TEXT,
-            //             SORTABLE: true
-            //         },
-            //         ward: SchemaFieldTypes.TEXT,
-            //         district: SchemaFieldTypes.TEXT,
-            //         city: SchemaFieldTypes.TEXT,  
-            //         price: SchemaFieldTypes.NUMERIC,
-            //         acreage: SchemaFieldTypes.NUMERIC         
-            //     },{
-            //         ON: 'JSON',
-            //         PREFIX: 'noderedis:real-easte-info'
-            //     })
-            // } catch (e) {
-            //     if (e.message === 'Index already exists') {
-            //         console.log('Index exists already, skipped creation.');
-            //       } else {
-            //         // Something went wrong, perhaps RediSearch isn't installed...
-            //         console.error(e);
-            //         process.exit(1);
-            //       }
-            // }
-            await redis_client.json.set(`noderedis:real-easte-info:${info.id}`,'$',{
-                ward: ward,
-                district: district,
-                city: city,
-                price: price,
-                acreage: acreage
-            })
-            
-            
+            )        
             //console.log(images);
             return info
         }else throw Errors.NotFound
@@ -532,19 +492,24 @@ export class RealEasteNews implements BaseService{
 
     searchRealEaste = async (search_query: any,page:number, limit:number) => {
         // console.log(search_query);
-        // const pagegination = new Pagination(page, limit)
-        // const offset = pagegination.getOffset()
-        // const price = util.price(search_query.price) 
-        // const acreage = util.acreage(search_query.acreage)
-        // // const info = await dataSource.getRepository(Real_Easte_News)
-        // //                              .createQueryBuilder('easte')
-        // //                              .where('easte.title like :title', {title: `%${search_query.title}%`})
-        // //                              .getMany()
-        // // const info = await Real_Easte_News.find({where:{
-        // //     title: Like(`%${search_query.title}%`)
-        // // }})
+        const pagegination = new Pagination(page, limit)
+        const offset = pagegination.getOffset()
+        const price = util.price(search_query.price) 
+        const acreage = util.acreage(search_query.acreage)
+        // const info = await dataSource.getRepository(Real_Easte_News)
+        //                              .createQueryBuilder('easte')
+        //                              .where('easte.title like :title', {title: `%${search_query.title}%`})
+        //                              .getMany()
+        const info = await Real_Easte_News.find({where:[{
+            title: Like(`%${search_query.title}%`), status: 'Release'
+        }]})
         // const info = 
         // console.log(info);
+        // await redis_client.ft.sugAdd(``,``,1)
+        //const data = await redis_client.ft.search(`idx:real-easte-info`,`@title:6`)
+        // console.log(data);
+        //const data = await dataSource.query(`SELECT * FROM real_easte_news WHERE title LIKE $1`, ['N%' + search_query.title + '%'])
+        return info
     }
 
 
@@ -599,6 +564,8 @@ export class RealEasteNews implements BaseService{
         return output
         // if(listNewsSaved){
     }
+
+    //lay tin k duyet chua lam NHO LAM
 
 
 }

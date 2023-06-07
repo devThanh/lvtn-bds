@@ -15,7 +15,7 @@ export class UserMiddleware{
         let user = new UserDTO()
         user.email = req.body.email
         user.password = req.body.password
-        user.fullname = req.body.fullname
+        user.fullName = req.body.fullName
         //user.address = req.body.address
         //user.phone = req.body.phone
         //user.avatar = req.file.originalname
@@ -51,7 +51,7 @@ export class UserMiddleware{
     valdidateUpdateProfileUser = async (req: Request, res: Response, next: NextFunction) => {
         let user = new UpdateProfileUser()
         user.email = req.body.email
-        user.fullname = req.body.fullname
+        user.fullName = req.body.fullName
         user.address = req.body.address
         user.dateOfBirth = req.body.dateOfBirth
         user.phone = req.body.phone

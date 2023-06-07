@@ -24,7 +24,7 @@ export class UserController{
       // let file = null
       // if (req.file !== undefined) file = req.file
       try {
-         const result = await this.userService.register(req.body.email,req.body.password, req.body.fullname,req.body.dateOfBirth,req.body.address, req.body.phone, req.file)
+         const result = await this.userService.register(req.body.email,req.body.password, req.body.fullName,req.body.dateOfBirth,req.body.address, req.body.phone, req.file)
          res.send(new ResponseWrapper(result))
       } catch (error) {
          next(error)
@@ -55,7 +55,7 @@ export class UserController{
 
    updateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
       try {
-         const result = await this.userService.updateProfile(req.email,req.body.email, req.body.password, req.body.fullname, req.body.dateOfBirth, req.body.address, req.body.phone, req.file)
+         const result = await this.userService.updateProfile(req.email,req.body.email, req.body.password, req.body.fullName, req.body.dateOfBirth, req.body.address, req.body.phone, req.file)
          res.send(new ResponseWrapper(result))
       } catch (error) {
          next(error)

@@ -15,7 +15,7 @@ export class UserDTO{
 
     @Expose()
     @IsString()
-    fullname: string
+    fullName: string
 
     // @Exclude()
     // @IsString()
