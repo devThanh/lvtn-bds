@@ -18,6 +18,9 @@ export class Payment extends BaseEntity{
     @Column()
     content: string
 
+    @Column({nullable: true})
+    status: string
+
     @Column()
     created_date: string
     

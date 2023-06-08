@@ -43,6 +43,9 @@ export class Real_Easte_News extends BaseEntity{
     @Column({default: false})
     deleted: boolean
 
+    @Column({nullable: true})
+    isPay: string
+
     @Column('uuid',{nullable: true})
     admin: string
 

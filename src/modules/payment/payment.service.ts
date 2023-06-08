@@ -7,6 +7,7 @@ import { AuthService } from "../auth/auth.service"
 import { Payment } from "./entities/payment.model"
 import { User } from "../user/entities/user.model"
 import { Errors } from "../../helpers/error"
+import { Real_Easte_News } from "../real_easte_news/entities/real_easte_news.model"
 moment.locale('Asia/Ho_Chi_Minh')
 
 
@@ -97,12 +98,34 @@ export class PaymentService implements BaseService{
             let d= Date.parse(vnp_Params['vnp_PayDate'].toString())
             let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
             payment.created_date = s
+            payment.status = 'success'
             payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+            const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+            let real = await Real_Easte_News.findOneBy({id: real_easte_id})
+            real.isPay = 'paid'
+            await real.save()
             payment.user = user.id
             await payment.save()
     
             return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
         } else{
+            let payment = new Payment()
+            payment.id = vnp_Params['vnp_TransactionNo'].toString()
+            payment.price = vnp_Params['vnp_Amount'].toString()
+            payment.bank = vnp_Params['vnp_BankCode'].toString()
+            payment.content = vnp_Params['vnp_OrderInfo'].toString() 
+            payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
+            let d= Date.parse(vnp_Params['vnp_PayDate'].toString())
+            let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
+            payment.created_date = s
+            payment.status = 'fail'
+            payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+            const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+            payment.user = user.id
+            let real = await Real_Easte_News.findOneBy({id: real_easte_id})
+            real.isPay = 'unpaid'
+            await real.save()
+            await payment.save()
             return({code: '97' , message:'success'})
         }
         //console.log("SSSS: ",req.query)
