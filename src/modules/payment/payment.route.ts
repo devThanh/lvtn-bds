@@ -13,6 +13,6 @@ const paymentController = new PaymentController(paymentService, authService)
 
 
 paymentRouter.post('/create_payment_url', authMiddleware.authorize, paymentController.createPaymentURL)
-paymentRouter.get('/vnpay_return', paymentController.vnpayReturn)
+paymentRouter.get('/vnpay_return', authMiddleware.authorize,  paymentController.vnpayReturn)
 paymentRouter.get('/:paymentId', paymentController.getPayment)
 paymentRouter.get('/', paymentController.getAllPayment)
