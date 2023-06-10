@@ -184,6 +184,7 @@ export class RealEasteNewsController{
     }
 
     getNewsToApprove = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        console.log("object");
         const page = Pagination.fromReq(req)
         //console.log('TTT: ',req.query);
         try {

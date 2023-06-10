@@ -132,7 +132,7 @@ export class UserService implements BaseService{
                               Bucket: "lvtn-bds",
                               Key: imageName
                             }),
-                            { expiresIn: 3600 }// 60 seconds
+                            { expiresIn: 3600 }// 60*60 seconds
                           )
                     }
                     const data = {
@@ -156,6 +156,7 @@ export class UserService implements BaseService{
 
     updateProfile = async(email: string, newEmail: string, password: string, fullname: string, dateOfBirth: string, address: string, phone: string, avatar: Express.Multer.File) => {
         const user = await User.findOneBy({email: email, type:''})
+        console.log(user);
         if(user!== null){
             user.email = newEmail
             user.fullname = fullname
@@ -163,34 +164,52 @@ export class UserService implements BaseService{
             user.dateOfBirth = date
             user.address = address
             user.phone = phone
-            if(user.avatar===null){
+            // if(user.avatar===null){
 
+            //     const filename = await bcrypt.generateFileName()
+            //     user.avatar=filename
+            // }
+            if(avatar !== undefined){
                 const filename = await bcrypt.generateFileName()
-                user.avatar=filename
+                user.avatar = filename
+                const bucketParams = {
+                    Bucket: "lvtn-bds",
+                    Key: filename,
+                    Body: avatar.buffer
+                };
+                const info = await s3Client.send(new PutObjectCommand(bucketParams));
+                    console.log(
+                      "Successfully uploaded object: " +
+                        bucketParams.Bucket +
+                        "/" +
+                        bucketParams.Key
+                    );
+                await user.save()
+                
             }
-            const bucketParams = {
-                Bucket: "lvtn-bds",
-                Key: user.avatar,
-                Body: avatar.buffer
-            };
-            const info = await s3Client.send(new PutObjectCommand(bucketParams));
-                console.log(
-                  "Successfully uploaded object: " +
-                    bucketParams.Bucket +
-                    "/" +
-                    bucketParams.Key
-                );
+            let img: string = null
+            if(user.avatar!==null){
+
+                img = await getSignedUrl(
+                    s3Client,
+                    new GetObjectCommand({
+                      Bucket: "lvtn-bds",
+                      Key: user.avatar
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                  )
+            }
             //user.avatar=filename
             const data = {
                 "id" : user.id,
                 "email": user.email,
                 "fullname": user.fullname,
-                "avatar": user.avatar,
+                "avatar": img,
                 "dateOfBirth": user.dateOfBirth,
                 "phone": user.phone,
                 "address": user.address,
             }
-            await user.save()
+            //await user.save()
             return data
         }else throw Errors.NotFound
     }
@@ -311,9 +330,7 @@ export class UserService implements BaseService{
         const admin = new Admin()
         admin.email = email
         admin.password = password
-        return await admin.save()
-        
-        
+        return await admin.save()  
     }
 }
 

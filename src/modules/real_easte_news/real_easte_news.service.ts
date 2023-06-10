@@ -225,7 +225,7 @@ export class RealEasteNews implements BaseService{
                           Bucket: "lvtn-bds",
                           Key: imageName
                         }),
-                        { expiresIn: 3600 }// 60 seconds
+                        { expiresIn: 3600 }// 60*60 seconds
                     )
                     const data = {
                         "id":element.id,
@@ -274,7 +274,7 @@ export class RealEasteNews implements BaseService{
                           Bucket: "lvtn-bds",
                           Key: imageName
                         }),
-                        { expiresIn: 3600 }// 60 seconds
+                        { expiresIn: 3600 }// 60*60 seconds
                     )
                     const data = {
                         "id":element.id,
@@ -481,12 +481,30 @@ export class RealEasteNews implements BaseService{
 
     detailRealEasreNews = async (slug: string) => {
         const info = await Info_Real_Easte.findOneBy({real_easte_id: slug})
+        const news = await Real_Easte_News.findOneBy({slug: info.real_easte_id})
+        const image = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+        const user = await User.findOneBy({id: info.user})
+        console.log(info);
         if(info!==null){
             //const data = dataSource
-            // const data = await dataSource.query(`select a.email, a.type, a.fullname, a.address, a.phone,b.slug, c.id, c.real_easte_id,c.acreage, c.price,c.status,c.number_bedrooms,c.number_bathrooms,c.number_floors,c.direction,c.balcony_direction,c.facade,c.road_width,c.interior,c.address,c.location,c.length,c.width,c.total_usable_area,c.ward,c.district,c.city,c.user, d.images from public.user a inner join real_easte_news b on a.id::uuid = b.user::uuid inner join info_real_easte c on c.real_easte_id = b.slug inner join image_real_easte d on d.real_easte_id::uuid = c.id::uuid where b.slug = 'tran-van-thanh'`)
-            const data = await excuteProcedure(real_easte_newsProcedure.GetDetailRealEaste, [info.real_easte_id])
-            console.log(data);
-            return data
+             //const data = await dataSource.query(`select a.email, a.type, a.fullname, a.address, a.phone,b.slug, c.id, c.real_easte_id,c.acreage, c.price,c.status,c.number_bedrooms,c.number_bathrooms,c.number_floors,c.direction,c.balcony_direction,c.facade,c.road_width,c.interior,c.address,c.location,c.length,c.width,c.total_usable_area,c.ward,c.district,c.city,c.user, d.images from public.user a inner join real_easte_news b on a.id::uuid = b.user::uuid inner join info_real_easte c on c.real_easte_id = b.slug inner join image_real_easte d on d.real_easte_id::uuid = c.id::uuid where b.slug = '${slug}'`)
+            //const data = await excuteProcedure(real_easte_newsProcedure.GetDetailRealEaste, [info.real_easte_id])
+            //console.log(data);
+            //return data
+            const imgarr: Array<Object> = []
+            for (let img of image) { // For each post, generate a signed URL and save it to the post object
+                const imageName = img.images
+                img.images = await getSignedUrl(
+                  s3Client,
+                  new GetObjectCommand({
+                    Bucket: "lvtn-bds",
+                    Key: imageName
+                  }),
+                  { expiresIn: 3600 }// 60*60 seconds
+                )
+                imgarr.push(img)
+            }
+            return {info, news, imgarr, user}
         }
     }
 
@@ -570,9 +588,9 @@ export class RealEasteNews implements BaseService{
     getDisapproveNews = async (email: string, page: number, limit: number) => {
         const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
-        const admin = Admin.findOneBy({email: email})
+        const admin = await Admin.findOneBy({email: email})
         if(admin!==null){
-            const data = Real_Easte_News.find({where:{status:'Disapprove'},skip:skip,take:limit})
+            const data = await Real_Easte_News.find({where:{status:'Disapprove'},skip:skip,take:limit})
             console.log(data);
             return data
         }else throw Errors.Unauthorized
@@ -581,9 +599,10 @@ export class RealEasteNews implements BaseService{
     getNewsToApprove = async (email:string, page:number, limit: number) => {
         const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
-        const admin = Admin.findOneBy({email: email})
+        const admin = await Admin.findOneBy({email: email})
+        console.log(admin);
         if(admin!==null){
-            const data = Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
+            const data = await Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
             console.log(data);
             return data
         }else throw Errors.Unauthorized

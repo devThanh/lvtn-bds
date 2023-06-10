@@ -286,19 +286,19 @@ export class NewsService implements BaseService{
         //const news = JSON.parse(newsa)
         if (news.length === 0) throw Errors.NotFound
         else{
-        //     for (let post of news) { // For each post, generate a signed URL and save it to the post object
-        //         const imageName = post.thumbnail
-        //         post.thumbnail = await getSignedUrl(
-        //           s3Client,
-        //           new GetObjectCommand({
-        //             Bucket: "lvtn-bds",
-        //             Key: imageName
-        //           }),
-        //           { expiresIn: 60 }// 60 seconds
-        //         )
-        //       }
-        // }
+            for (let post of news) { // For each post, generate a signed URL and save it to the post object
+                const imageName = post.thumbnail
+                post.thumbnail = await getSignedUrl(
+                  s3Client,
+                  new GetObjectCommand({
+                    Bucket: "lvtn-bds",
+                    Key: imageName
+                  }),
+                  { expiresIn: 3600 }// 60*60 seconds
+                )
+            }
+        }
             return news
         }
-    }
+    
 }
