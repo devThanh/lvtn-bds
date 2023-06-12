@@ -66,8 +66,8 @@ export class RealEasteNews implements BaseService{
                     );
                     return await newsEaste.save()
             }else newsEaste.thumbnail = ''
-            // redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            // redis_client.HSET(`${email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
+            redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
+            redis_client.HSET(`${email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             return await newsEaste.save()
             
         } catch (error) {
@@ -127,34 +127,6 @@ export class RealEasteNews implements BaseService{
             if(result!==null && result.user === user.id && result.deleted === false){
                 result.deleted = true
                 await result.save()
-                // console.log(content);
-                // const newsEaste = new Real_Easte_News()
-                // newsEaste.id = Date.now().toString()
-                // newsEaste.content = content
-                // newsEaste.title = title
-                // newsEaste.expiration_date = expiration_date
-                // newsEaste.status = status
-                // newsEaste.type = type
-                // const user = await User.findOneBy({email:email, type: typeUser})
-                // newsEaste.user = user.id
-                // if(thumbnail!==undefined){
-                //     //const filename = await bcrypt.generateFileName()
-                //     //newsEaste.thumbnail = filename
-                //     // const bucketParams = {
-                //     //     Bucket: "lvtn-bds",
-                //     //     Key: newsEaste.thumbnail,
-                //     //     Body: thumbnail.buffer
-                //     // };
-                //     // const data = await s3Client.send(new PutObjectCommand(bucketParams))
-                //     //     console.log(
-                //     //       "Successfully uploaded object: " +
-                //     //         bucketParams.Bucket +
-                //     //         "/" +
-                //     //         bucketParams.Key
-                //     //     );
-                // }
-                // //redis_client.HSET(`${}`,``,``)
-                // return await newsEaste.save()
                 return {message:'Hidden successfully!!'}
             } else throw Errors.NotFound
         } catch (error) {
@@ -209,7 +181,7 @@ export class RealEasteNews implements BaseService{
         const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release'}, skip:skip, take: limit})
         console.log('111',news);
-        const res: Array<Object> = []
+        let res: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
                 //console.log("object");
@@ -227,7 +199,7 @@ export class RealEasteNews implements BaseService{
                         }),
                         { expiresIn: 3600 }// 60*60 seconds
                     )
-                    const data = {
+                    let data = {
                         "id":element.id,
                         "title":element.title,
                         "content":element.content,
@@ -244,8 +216,6 @@ export class RealEasteNews implements BaseService{
                         "slug": element.slug
                     }
                     console.log(data);
-                    //console.log(element)
-                    //res.push(element)
                     res.push(data)
                 }
             })
@@ -306,8 +276,11 @@ export class RealEasteNews implements BaseService{
     
 
     approveRealEasteNews = async (id: string, email: string) => {
-        const news = await Real_Easte_News.findOneBy({id: id, status: ''})
+        try {
+            const news = await Real_Easte_News.findOneBy({id: id, status: ''})
+        console.log("Real: ", news);
         const admin = await Admin.findOneBy({email: email})
+        console.log(news, admin);
         //const user
         if(admin!==null){
             if(news!==null){
@@ -322,7 +295,7 @@ export class RealEasteNews implements BaseService{
                 news.admin = admin.id
                 await news.save()
                 
-                const delay = Number(news.expiration)  * 60 * 60 * 24*1000
+                const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
                 //const delay = 60*30*1000
                 await expirationRealEasteNews.add(
@@ -331,9 +304,12 @@ export class RealEasteNews implements BaseService{
                     { removeOnComplete: true, removeOnFail: true, delay:delay }
                 )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
-                redis_client.HSET(`admin-${admin.email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
+                redis_client.HSET(`admin-${admin.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
             }else throw Errors.BadRequest
         }else throw Errors.Unauthorized
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 
