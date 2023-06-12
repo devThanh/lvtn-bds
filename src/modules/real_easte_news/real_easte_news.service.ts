@@ -449,6 +449,7 @@ export class RealEasteNews implements BaseService{
             info.location = `${loc[0].longitude}, ${loc[0].latitude}`
             info.user = reNews.user
             console.log(info);
+            console.log(images);
             await info.save()
             const res = await Promise.all(
                 images.map(async (item) =>{
@@ -486,6 +487,10 @@ export class RealEasteNews implements BaseService{
         const user = await User.findOneBy({id: info.user})
         console.log(info);
         if(info!==null){
+            Object.getOwnPropertyNames(info.location).forEach(key => {
+                let value = info.location[key];
+                console.log(value);
+            });
             //const data = dataSource
              //const data = await dataSource.query(`select a.email, a.type, a.fullname, a.address, a.phone,b.slug, c.id, c.real_easte_id,c.acreage, c.price,c.status,c.number_bedrooms,c.number_bathrooms,c.number_floors,c.direction,c.balcony_direction,c.facade,c.road_width,c.interior,c.address,c.location,c.length,c.width,c.total_usable_area,c.ward,c.district,c.city,c.user, d.images from public.user a inner join real_easte_news b on a.id::uuid = b.user::uuid inner join info_real_easte c on c.real_easte_id = b.slug inner join image_real_easte d on d.real_easte_id::uuid = c.id::uuid where b.slug = '${slug}'`)
             //const data = await excuteProcedure(real_easte_newsProcedure.GetDetailRealEaste, [info.real_easte_id])
