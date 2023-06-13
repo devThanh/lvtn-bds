@@ -188,6 +188,7 @@ export class RealEasteNews implements BaseService{
             news.map(async(element)=>{
                 //console.log("object");
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
+                console.log(info);
                 const user = await User.findOneBy({id: element.user})
                 console.log('222',element.slug);
                 if(element.thumbnail!==''){
