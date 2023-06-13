@@ -202,20 +202,22 @@ export class RealEasteNews implements BaseService{
                         { expiresIn: 3600 }// 60*60 seconds
                     )
                     let data = {
-                        "id":element.id,
-                        "title":element.title,
-                        "content":element.content,
-                        "thumbnail":element.thumbnail,
-                        "price":info.price,
-                        "acreage":info.acreage,
-                        "number_bathrooms":info.number_bathrooms,
-                        "number_bedrooms":info.number_bedrooms,
-                        "district":info.district,
-                        "city": info.city,
-                        "email":user.email,
-                        "phone":user.phone,
-                        "approve_date": element.approval_date,
-                        "slug": element.slug
+                        "real_easte_id": element,
+                        "info_real_easte": info
+                        // "id":element.id,
+                        // "title":element.title,
+                        // "content":element.content,
+                        // "thumbnail":element.thumbnail,
+                        // "price":info.price,
+                        // "acreage":info.acreage,
+                        // "number_bathrooms":info.number_bathrooms,
+                        // "number_bedrooms":info.number_bedrooms,
+                        // "district":info.district,
+                        // "city": info.city,
+                        // "email":user.email,
+                        // "phone":user.phone,
+                        // "approve_date": element.approval_date,
+                        // "slug": element.slug
                     }
                     console.log(data);
                     res.push(data)
