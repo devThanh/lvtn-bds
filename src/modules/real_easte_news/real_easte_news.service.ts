@@ -177,7 +177,8 @@ export class RealEasteNews implements BaseService{
         // )
         // console.log(res)
         // return res
-        const pagegination = new Pagination(page, limit)
+        try {
+            const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
         const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release'}, skip:skip, take: limit})
@@ -224,6 +225,9 @@ export class RealEasteNews implements BaseService{
         
         console.log('213 ',res)
         return res
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     getByCategory = async (slug: string, page: number, limit: number) => {
