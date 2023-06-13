@@ -7,7 +7,7 @@ import { AuthService } from "../auth/auth.service";
 import { Real_Easte_News } from "./entities/real_easte_news.model";
 import { Errors } from "../../helpers/error";
 import { User } from "../user/entities/user.model";
-import redis_client, { emailQueue, expirationRealEasteNews } from "../../../redis_connect";
+import redis_client, { emailQueue, expirationRealEasteNews, senMailerApproveQueue, senMailerDisapproveQueue } from "../../../redis_connect";
 import { Admin } from "../user/entities/admin.model";
 import moment from 'moment';
 import { Pagination } from "../../helpers/response.wrapper";
@@ -26,6 +26,7 @@ import { SchemaFieldTypes } from "redis";
 import util from "../../util/util";
 import { Between, Like, getRepository } from "typeorm";
 import { title } from "process";
+import { it } from "node:test";
 moment.locale('vn')
 const dataSource = ConnectDB.AppDataSource
 
@@ -303,6 +304,12 @@ export class RealEasteNews implements BaseService{
                     { id: id },
                     { removeOnComplete: true, removeOnFail: true, delay:delay }
                 )
+                const user = await User.findOneBy({id: news.user})
+                await senMailerApproveQueue.add(
+                    'senMailerApprove',
+                    {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: news.approval_date, name: user.fullname},
+                    {removeOnComplete: true, removeOnFail: true}
+                )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
                 redis_client.HSET(`admin-${admin.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
             }else throw Errors.BadRequest
@@ -336,6 +343,11 @@ export class RealEasteNews implements BaseService{
                 //     { removeOnComplete: true, removeOnFail: true, delay:delay }
                 //)
                 const user = await User.findOneBy({id: news.user})
+                await senMailerDisapproveQueue.add(
+                    'senMailerDisapprove',
+                    {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: news.approval_date, name: user.fullname},
+                    {removeOnComplete: true, removeOnFail: true}
+                )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(a))
                 redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(admin))
             }else throw Errors.NotFound
@@ -454,6 +466,50 @@ export class RealEasteNews implements BaseService{
             //console.log(images);
             return info
         }else throw Errors.NotFound
+    }
+
+    editInfoRealEaste = async (real_easte_id: string, acreage: number, price: number, status: string, number_bedrooms: number, number_bathrooms: number, number_floors: number, direction: string, balcony_direction: string, facade: number, road_width: number, interior: string, address: string, length: number, width: number, total_usable_area: string, ward: string, district: string ,city: string) =>{
+        try {
+            //const reNews = await Real_Easte_News.findOneBy({slug: real_easte_id})
+        //if(reNews!==null){
+            const info = await Info_Real_Easte.findOneBy({id: real_easte_id})
+            const reNews = await Real_Easte_News.findOneBy({slug: info.real_easte_id})
+            console.log(reNews);
+            if(info!==null){
+                //const image = new Image_Real_Easte()
+                //info.real_easte_id = reNews.slug
+                info.acreage = acreage
+                info.price = price
+                info.status = status
+                info.number_bathrooms = number_bathrooms
+                info.number_bedrooms = number_bedrooms
+                info.number_floors = number_floors
+                info.direction = direction
+                info.balcony_direction = balcony_direction
+                info.facade = facade
+                info.road_width = road_width
+                info.interior = interior
+                info.length = length
+                info.width = width
+                info.total_usable_area = total_usable_area
+                info.ward = ward
+                info.district = district
+                info.city = city
+                const dc = `${address}${`, `}${ward}${`, `}${district}${`, `}${city}`
+                info.address = dc
+                const loc = await geocoder.geocode(dc);
+                console.log(loc[0].longitude,loc[0].latitude);
+                info.location = `${loc[0].longitude}, ${loc[0].latitude}`
+                info.user = reNews.user
+                console.log(info);       
+                await info.save()
+                return info
+        //}else throw Errors.NotFound
+            }           
+        } catch (error) {
+            console.log(error);
+            throw Errors.BadRequest
+        }
     }
 
     detailRealEasreNews = async (slug: string) => {
@@ -589,5 +645,27 @@ export class RealEasteNews implements BaseService{
         }else throw Errors.Unauthorized
     }
 
+
+    //get news by user
+    getNewsByUser =async (email:string, type: string) => {
+        const user = await User.findOneBy({email:email, type: type})
+        if(user!==null){
+            const data = await redis_client.HVALS(`${user.email}:${`real-estate-news`}`)
+            console.log(data);
+            let kq: Array<Object> = []
+            const res = await Promise.all(
+                data.map(async(item)=>{
+                    const a = JSON.parse(item)
+                    const info = await Info_Real_Easte.findOneBy({real_easte_id: a.slug})
+                    let s ={
+                        real_easte_news: a,
+                        info_real_easte: info
+                    }
+                    kq.push(s)
+                })
+            )
+            return kq
+        }else throw Errors.NotFound
+    }
 
 }

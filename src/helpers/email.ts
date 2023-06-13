@@ -78,7 +78,7 @@ export async function senMailerApprove(email: string, real_easte_id: string, exp
     mailOptions.to = email
     mailOptions.subject = `Hi ${name}`
     mailOptions.text = `THÔNG BÁO`
-    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ${real_easte_id} đã được duyệt vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>`
+    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã được duyệt vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>`
     await transporter.sendMail(mailOptions, async function (error, info) {
         if (error) {
             console.log(error)
@@ -95,7 +95,7 @@ export async function senMailerDisapprove(email: string, real_easte_id: string, 
     mailOptions.to = email
     mailOptions.subject = `Hi ${name}`
     mailOptions.text = `THÔNG BÁO`
-    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ${real_easte_id} đã không được duyệt vì không đủ tiêu chuẩn. </br>Để biết thêm chi tiết xin liên hệ với quản trị viên.</br> Cảm ơn</p>`
+    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã không được duyệt vì không đủ tiêu chuẩn. </br>Để biết thêm chi tiết xin liên hệ với quản trị viên.</br> Cảm ơn</p>`
     await transporter.sendMail(mailOptions, async function (error, info) {
         if (error) {
             console.log(error)

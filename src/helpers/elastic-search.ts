@@ -2,10 +2,6 @@
 
 // const client = new Client({
 //     node: 'https://localhost:9200',
-//     auth: {
-//     username: 'elastic',
-//     password: 'elastic'
-//   }
 // })
 
 // // client.indices.create({

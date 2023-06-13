@@ -28,6 +28,7 @@ export class AuthMiddleware {
             console.log('TTTT',payload)
             req.fullname = payload.name
             req.email = payload.email
+            req.type = payload.type
             next()
         } catch (error) {
             console.error(error)

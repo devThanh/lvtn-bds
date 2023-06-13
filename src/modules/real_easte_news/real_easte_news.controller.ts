@@ -51,6 +51,7 @@ export class RealEasteNewsController{
     }
 
     getAll =async (req: Request, res: Response, next: NextFunction) => {
+        console.log("object");
         const page = Pagination.fromReq(req)
         try {
             const result = await this.realEasteNewsService.getAll(page.page,page.limit)
@@ -133,6 +134,15 @@ export class RealEasteNewsController{
         }
     }
 
+    editInfoRealEaste =async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.editInfoRealEaste(req.params.real_easte_id, req.body.acreage, req.body.price, req.body.status, req.body.number_bedrooms, req.body.number_bathrooms, req.body.number_floors, req.body.direction, req.body.balcony_direction, req.body.facade, req.body.road_width, req.body.interior, req.body.address, req.body.length, req.body.width, req.body.total_usable_area, req.body.ward, req.body.district ,req.body.city)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     detailInfoRealEaste =async (req: Request, res: Response, next: NextFunction) => {
         try {
             const result = await this.realEasteNewsService.detailRealEasreNews(req.params.slug)
@@ -193,5 +203,15 @@ export class RealEasteNewsController{
         } catch (error) {
             next(error)
         }
+    }
+
+    getNewsByUser =async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.getNewsByUser(req.email, req.type)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            next(error)
+        }
+        
     }
 }

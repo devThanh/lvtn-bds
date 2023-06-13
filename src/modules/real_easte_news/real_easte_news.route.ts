@@ -14,7 +14,7 @@ const realEasteNewsService = new RealEasteNews(authService)
 const realEasteNewsMiddleware = new RealEasteNewsMiddleware()
 const realEasteNewsController = new RealEasteNewsController(realEasteNewsService, authService)
 
-
+realEasteRouter.get('/news-user', authMiddleware.authorize, realEasteNewsController.getNewsByUser)
 realEasteRouter.get('/get-disapprove', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/get-news', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/search', realEasteNewsController.search)
@@ -22,6 +22,7 @@ realEasteRouter.post('/save/:real_easte_id', authMiddleware.authorize, realEaste
 realEasteRouter.get('/get-saved', authMiddleware.authorize, realEasteNewsController.getSave)
 realEasteRouter.get('/detail/:slug', realEasteNewsController.detailInfoRealEaste)
 realEasteRouter.post('/create-info', upload.array('images',10), authMiddleware.authorize, realEasteNewsController.infoRealEaste)
+realEasteRouter.put('/edit-info/:real_easte_id', authMiddleware.authorize, realEasteNewsController.editInfoRealEaste)
 realEasteRouter.put('/disapprove/:id', authMiddleware.authorize, realEasteNewsController.disapproveRealEasteNews)
 realEasteRouter.put('/approve/:id', authMiddleware.authorize, realEasteNewsController.approveRealEasteNews)
 realEasteRouter.get('/:slug', realEasteNewsController.getByCategory)
