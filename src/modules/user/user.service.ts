@@ -133,7 +133,7 @@ export class UserService implements BaseService{
                               Bucket: "lvtn-bds",
                               Key: imageName
                             }),
-                            { expiresIn: Infinity }// 60*60 seconds  //Infinity
+                            { expiresIn: 3600 }// 60*60 seconds  //Infinity
                           )
                     }
                     const data = {
