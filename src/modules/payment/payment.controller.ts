@@ -19,7 +19,8 @@ export class PaymentController{
             const result = await this.paymentService.createPaymentURL(ipAddr, req.body.amount, req.body.bankCode, req.body.language, req.body.real_easte_id, req.email, req.type)
             
             console.log(result);//res.send(new ResponseWrapper(result))
-            res.redirect(result)
+            res.send(new ResponseWrapper(result))
+            //res.redirect(result)
         } catch (error) {
             console.log(error);
             next(error)
