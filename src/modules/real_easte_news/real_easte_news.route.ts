@@ -14,6 +14,7 @@ const realEasteNewsService = new RealEasteNews(authService)
 const realEasteNewsMiddleware = new RealEasteNewsMiddleware()
 const realEasteNewsController = new RealEasteNewsController(realEasteNewsService, authService)
 
+realEasteRouter.put('/re-post/:slug', authMiddleware.authorize, realEasteNewsController.rePost)
 realEasteRouter.get('/news-user', authMiddleware.authorize, realEasteNewsController.getNewsByUser)
 realEasteRouter.get('/get-disapprove', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/get-news', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)

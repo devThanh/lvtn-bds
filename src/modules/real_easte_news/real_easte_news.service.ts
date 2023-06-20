@@ -7,7 +7,7 @@ import { AuthService } from "../auth/auth.service";
 import { Real_Easte_News } from "./entities/real_easte_news.model";
 import { Errors } from "../../helpers/error";
 import { User } from "../user/entities/user.model";
-import redis_client, { emailQueue, expirationRealEasteNews, senMailerApproveQueue, senMailerDisapproveQueue } from "../../../redis_connect";
+import redis_client, { emailQueue, expirationRealEasteNews, senMailerApproveQueue, senMailerDisapproveQueue, senMailerRePostQueue } from "../../../redis_connect";
 import { Admin } from "../user/entities/admin.model";
 import moment from 'moment';
 import { Pagination } from "../../helpers/response.wrapper";
@@ -673,6 +673,35 @@ export class RealEasteNews implements BaseService{
             )
             return kq
         }else throw Errors.NotFound
+    }
+
+    reRelease =async (slug: string, type: number, expiration: number, email: string, userType: string) => {
+        const user = await User.findOneBy({email: email, type: userType})
+        if(user===null)throw Errors.Unauthorized
+        const news = await Real_Easte_News.findOneBy({slug: slug, status:'Expiration', user: user.id})
+        if(news !== null){
+            news.type = type
+            news.expiration = expiration
+            news.status = 'Release'
+            const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+            news.updated_date = date
+            await news.save()
+            const delay = Number(news.expiration)*60*60*24*1000
+                //console.log(delays);10000
+                //const delay = 60*30*1000
+                await expirationRealEasteNews.add(
+                    'expiration-real-easte-news',
+                    { id: news.id },
+                    { removeOnComplete: true, removeOnFail: true, delay:delay }
+                )
+                //const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+                //const user = await User.findOneBy({id: news.user})
+                await senMailerRePostQueue.add(
+                    'senMailerRePost',
+                    {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: date, name: user.fullname},
+                    {removeOnComplete: true, removeOnFail: true}
+                )
+        }else throw Errors.BadRequest
     }
 
 }

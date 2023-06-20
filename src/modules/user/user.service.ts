@@ -35,6 +35,7 @@ export class UserService implements BaseService{
             const passEncoding = await bcrypt.encode(password)
             user.fullname = fullname
             user.password = passEncoding
+            user.type = ''
             user.isActive = false
             //const date = new Date(dateOfBirth)
             //user.dateOfBirth=date

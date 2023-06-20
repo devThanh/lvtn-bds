@@ -107,3 +107,20 @@ export async function senMailerDisapprove(email: string, real_easte_id: string, 
         }
     })
 }
+
+export async function senMailerRePost(email: string, real_easte_id: string, expiration: number, approval_date: string, name: string) {
+    mailOptions.to = email
+    mailOptions.subject = `Hi ${name}`
+    mailOptions.text = `THÔNG BÁO`
+    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã được đăng lại vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>`
+    await transporter.sendMail(mailOptions, async function (error, info) {
+        if (error) {
+            console.log(error)
+        } else {
+            console.log('Email sent: ' + info.response)
+            // await redis_client.hSet(`${email}:${`verifyCode`}`, `${random}`, 1)
+            // await redis_client.expire(`${email}:${`verifyCode`}`,15*60)
+            // do something useful
+        }
+    })
+}

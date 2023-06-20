@@ -214,4 +214,14 @@ export class RealEasteNewsController{
         }
         
     }
+
+    rePost = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.reRelease(req.params.slug, req.body.type, req.body.expiration, req.email, req.type)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
 }
