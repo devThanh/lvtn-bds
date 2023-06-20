@@ -70,8 +70,9 @@ import util from './src/util/util'
 export const expirationWorker = new Worker(
     'expiration-real-easte-news',
     async (job) => {
-        util.expirationRealEasteNews(job.data.id)
+        const a = await util.expirationRealEasteNews(job.data.id)
         console.log('',job.data.id);
+        console.log("object:  ", a);
         
         //const new = await Real_Easte_News.findOneBy
     },

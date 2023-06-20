@@ -59,6 +59,6 @@ export class Real_Easte_News extends BaseEntity{
     @BeforeInsert()
     @BeforeUpdate()
     generateSlug() {
-      this.slug = slugify(this.title + '-' + Math.floor(Math.random() * 999999) + 1, { lower: true });
+      this.slug = slugify(this.title, { lower: true });
     }
 }
