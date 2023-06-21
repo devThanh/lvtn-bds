@@ -40,12 +40,12 @@ export class NewsService implements BaseService{
             };
             news.thumbnail=filename
                 //const data = await s3Client.send(new PutObjectCommand(bucketParams));
-                // console.log(
-                //   "Successfully uploaded object: " +
-                //     bucketParams.Bucket +
-                //     "/" +
-                //     bucketParams.Key
-                // );
+                console.log(
+                  "Successfully uploaded object: " +
+                    bucketParams.Bucket +
+                    "/" +
+                    bucketParams.Key
+                );
                 console.log(news)
                 const res = await news.save()
                 redis_client.HSET(`${`news:`}${news.author}`, `${news.id}`, JSON.stringify(res))
