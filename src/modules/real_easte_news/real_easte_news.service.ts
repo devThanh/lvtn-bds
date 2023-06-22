@@ -124,8 +124,9 @@ export class RealEasteNews implements BaseService{
     hiddenRealEasteNews = async (id: string, email: string, typeUser: string, content: string, title: string, expiration_date: number, type: number,status: string, thumbnail: Express.Multer.File) => {
         try {  
             const result = await Real_Easte_News.findOneBy({id: id})
-            const user = await User.findOneBy({email: email, type: typeUser})
-            if(result!==null && result.user === user.id && result.deleted === false){
+            const admin = await Admin.findOneBy({email: email})
+            //const user = await User.findOneBy({email: email, type: typeUser})
+            if(result!==null && admin!==null && result.deleted === false){
                 result.deleted = true
                 await result.save()
                 return {message:'Hidden successfully!!'}
@@ -140,9 +141,12 @@ export class RealEasteNews implements BaseService{
         try {  
             const result = await Real_Easte_News.findOneBy({id: id})
             const admin = await Admin.findOneBy({email: email})
-            if(result!==null && admin!== null){
+            const user = await User.findOneBy({email: email, type: typeUser})
+            if((result!==null && admin!== null) || (result!==null && user.id===result.user)){
                 result.deleted = true
                 await result.save()
+                const user = await User.findOneBy({id: result.user})
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`, result.id, JSON.stringify(result))
                 return {message:'Delete successfully!!'}
             } else throw Errors.NotFound
         } catch (error) {
@@ -318,6 +322,7 @@ export class RealEasteNews implements BaseService{
                     {removeOnComplete: true, removeOnFail: true}
                 )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
                 redis_client.HSET(`admin-${admin.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
             }else throw Errors.BadRequest
         }else throw Errors.Unauthorized
