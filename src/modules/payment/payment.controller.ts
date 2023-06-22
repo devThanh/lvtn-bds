@@ -29,7 +29,7 @@ export class PaymentController{
 
     vnpayReturn = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const result = this.paymentService.vnpayReturn(req.query,req.email, req.type)
+            const result = await this.paymentService.vnpayReturn(req.query,req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             next(error)
