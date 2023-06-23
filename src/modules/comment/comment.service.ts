@@ -143,6 +143,9 @@ export class CommentService implements BaseService{
         const user = await User.findOneBy({email: email, type: type})
         const comment = await Comment.findOneBy({ id: replycommentId, user_id: user.id })
         if(comment!==null){
+            const news = await Comment.findOneBy({id: comment.parent_comment, parent_comment: null})
+            news.totalRep -=1
+            await news.save()
             await comment.remove()
             return {message:'Xoa thanh cong'}
         }else throw Errors.NotFound
