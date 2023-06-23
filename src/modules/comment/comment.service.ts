@@ -324,6 +324,7 @@ export class CommentService implements BaseService{
             .createQueryBuilder('comment')
             //.addSelect('COUNT(comment.real_easte_id)', "reply_number")
             .where('comment.real_easte_id = :real_easte_id', { real_easte_id })
+            .andWhere('comment.parent_comment is null')
             //.select(['id','title','content'])
             //.groupBy('')
             .orderBy(`${orderExp}`, 'DESC')
