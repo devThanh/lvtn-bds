@@ -73,7 +73,7 @@ export class CommentService implements BaseService{
 
     deleteComment = async (commentId: string, email: string, type: string) => {
         const user = await User.findOneBy({email: email, type: type})
-        const comment = await Comment.findOneBy({ id: commentId })
+        const comment = await Comment.findOneBy({ id: commentId, parent_comment: null })
         if(comment!==null){
             await comment.remove()
             return {message:'Xoa thanh cong'}
@@ -85,7 +85,7 @@ export class CommentService implements BaseService{
         try {
             const user = await User.findOneBy({email: email, type: type})
             const admin = await Admin.findOneBy({email})
-            const comment = await Comment.findOneBy({ id: commentId })
+            const comment = await Comment.findOneBy({ id: commentId, parent_comment: null })
             if (
                 (comment !== null && comment.user_id === user.id) || admin!== null) {
                 await Comment.softRemove(comment)
