@@ -146,7 +146,7 @@ export class RealEasteNews implements BaseService{
                 result.deleted = true
                 await result.save()
                 const user = await User.findOneBy({id: result.user})
-                redis_client.HSET(`${user.email}:${`real-estate-news`}`, result.id, JSON.stringify(result))
+                redis_client.hDel(`${user.email}:${`real-estate-news`}`, result.id)
                 return {message:'Delete successfully!!'}
             } else throw Errors.NotFound
         } catch (error) {
