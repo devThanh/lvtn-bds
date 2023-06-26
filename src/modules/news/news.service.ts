@@ -58,6 +58,23 @@ export class NewsService implements BaseService{
         
     }
 
+    deleteNews = async (slug: string, email: string, typeUser: string) => {
+        try {  
+            const result = await News.findOneBy({slug: slug})
+            const admin = await Admin.findOneBy({email: email})
+            //const user = await User.findOneBy({email: email, type: typeUser})
+            if(result!==null && admin!== null && result.admin === admin.id){
+                //result.deleted = true
+                await result.remove()
+                //const user = await User.findOneBy({id: result.user})
+                redis_client.hDel(`${`news:`}${result.author}`, `${result.id}`)           
+            } else throw Errors.NotFound
+        } catch (error) {
+            console.log(error);
+            throw Errors.BadRequest
+        }
+    }
+
     updateNews = async (email: string, slug: string, title: string, content: string, description: string, thumbnail: Express.Multer.File) => {
             console.log(slug, email)
             const news = await News.findOneBy({slug: slug})

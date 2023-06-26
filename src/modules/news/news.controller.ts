@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { BaseService } from "../../service";
+import { BaseService, newsService } from "../../service";
 import { AuthService } from "../auth/auth.service";
 import { NewsService } from "./news.service";
 import { AuthRequest } from "../auth/auth.middleware";
@@ -28,6 +28,16 @@ export class NewsController {
         try {
             console.log('TTTTTTTTTTT')
             const result = await this.newsService.updateNews(req.email, req.params.slug, req.body.title, req.body.content, req.body.description, req.file)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
+
+    deleteNews =async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.newsService.deleteNews(req.params.slug, req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             console.log(error)
