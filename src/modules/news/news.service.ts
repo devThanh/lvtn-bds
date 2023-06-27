@@ -60,10 +60,11 @@ export class NewsService implements BaseService{
 
     deleteNews = async (slug: string, email: string, typeUser: string) => {
         try {  
-            const result = await News.findOneBy({slug: slug})
             const admin = await Admin.findOneBy({email: email})
+            const result = await News.findOneBy({slug: slug, admin: admin.email})
+            console.log(result, admin);
             //const user = await User.findOneBy({email: email, type: typeUser})
-            if(result!==null && admin!== null){
+            if(result!==null){
                 //result.deleted = true
                 await result.remove()
                 //const user = await User.findOneBy({id: result.user})
