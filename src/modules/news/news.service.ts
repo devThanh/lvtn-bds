@@ -145,16 +145,16 @@ export class NewsService implements BaseService{
                     redis_client.expire(`${email}:${`isSeen`}`, 2592000)
                 }
                 const data = JSON.parse(obj)
-                const imageName = res.thumbnail
-                res.thumbnail = await getSignedUrl(
-                  s3Client,
-                  new GetObjectCommand({
-                    Bucket: "lvtn-bds",
-                    Key: imageName
-                  }),
-                  { expiresIn: 3600 }// 60*60 seconds
-                )
-                return { res }
+                // const imageName = res.thumbnail
+                // res.thumbnail = await getSignedUrl(
+                //   s3Client,
+                //   new GetObjectCommand({
+                //     Bucket: "lvtn-bds",
+                //     Key: imageName
+                //   }),
+                //   { expiresIn: 3600 }// 60*60 seconds
+                // )
+                return { data }
             } else {
                 console.log("object");
                 const news = await News.findOneBy({ id: id })
