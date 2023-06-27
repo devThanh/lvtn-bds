@@ -125,9 +125,10 @@ export class NewsService implements BaseService{
                 //const a =await dataSource.query(`call countview('${res.id}')`)
                 //console.log(a)
                 // console.log(res)
-                await excuteProcedure(newsProcedure.IncreaseView, [res.id])
+                //await excuteProcedure(newsProcedure.IncreaseView, [res.id])
                 //let res: News = JSON.parse(redisSearch)
                 res.viewer += 1
+                await res.save()
                 //const data = await res.save()
                 //console.log(data)
                 const obj = JSON.stringify(res)
