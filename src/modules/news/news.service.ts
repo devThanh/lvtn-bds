@@ -128,7 +128,9 @@ export class NewsService implements BaseService{
                 //await excuteProcedure(newsProcedure.IncreaseView, [res.id])
                 //let res: News = JSON.parse(redisSearch)
                 res.viewer += 1
-                await res.save()
+                const news = await News.findOneBy({id: res.id})
+                news.viewer +=1
+                await news.save()
                 //const data = await res.save()
                 //console.log(data)
                 const obj = JSON.stringify(res)
