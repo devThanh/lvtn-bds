@@ -61,7 +61,7 @@ export class NewsService implements BaseService{
     deleteNews = async (slug: string, email: string, typeUser: string) => {
         try {  
             const admin = await Admin.findOneBy({email: email})
-            const result = await News.findOneBy({slug: slug})
+            const result = await News.findOneBy({id: slug})
             console.log(result, admin);
             //const user = await User.findOneBy({email: email, type: typeUser})
             if(admin!==null){
@@ -80,7 +80,7 @@ export class NewsService implements BaseService{
 
     updateNews = async (email: string, slug: string, title: string, content: string, description: string, thumbnail: Express.Multer.File) => {
             console.log(slug, email)
-            const news = await News.findOneBy({slug: slug})
+            const news = await News.findOneBy({id: slug})
             const admin = await Admin.findOneBy({email: email})
             console.log(news, admin)
             if(admin!== null){

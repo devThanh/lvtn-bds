@@ -16,6 +16,6 @@ newsRouter.get('/watch', authMiddleware.authorize, newsController.listNewsUserSe
 newsRouter.get('/save/:id', authMiddleware.authorize, newsController.save)
 newsRouter.get('/getsaved', authMiddleware.authorize, newsController.getNewsUserSaved)
 newsRouter.post('/create', authMiddleware.authorize, upload.single('thumbnail'), newsMiddleware.validateCreateNews, newsController.createNews)
-newsRouter.put('/edit/:slug', authMiddleware.authorize, upload.single('thumbnail'), newsController.updateNews)
-newsRouter.delete('/delete/:slug', authMiddleware.authorize, newsController.deleteNews)
+newsRouter.put('/edit/:id', authMiddleware.authorize, upload.single('thumbnail'), newsController.updateNews)
+newsRouter.delete('/delete/:id', authMiddleware.authorize, newsController.deleteNews)
 newsRouter.get('/:id', authMiddleware.checkLogin, newsController.newsDetail)

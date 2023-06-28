@@ -27,7 +27,7 @@ export class NewsController {
     updateNews =async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             console.log('TTTTTTTTTTT')
-            const result = await this.newsService.updateNews(req.email, req.params.slug, req.body.title, req.body.content, req.body.description, req.file)
+            const result = await this.newsService.updateNews(req.email, req.params.id, req.body.title, req.body.content, req.body.description, req.file)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             console.log(error)
@@ -37,7 +37,7 @@ export class NewsController {
 
     deleteNews =async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const result = await this.newsService.deleteNews(req.params.slug, req.email, req.type)
+            const result = await this.newsService.deleteNews(req.params.id, req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             console.log(error)

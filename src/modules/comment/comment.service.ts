@@ -73,7 +73,7 @@ export class CommentService implements BaseService{
 
     deleteComment = async (commentId: string, email: string, type: string) => {
         const user = await User.findOneBy({email: email, type: type})
-        const comment = await Comment.findOneBy({ id: commentId, parent_comment: null })
+        const comment = await Comment.findOneBy({ id: commentId, parent_comment: null, user_id: user.id })
         if(comment!==null){
             await comment.remove()
             return {message:'Xoa thanh cong'}
