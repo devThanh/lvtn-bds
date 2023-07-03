@@ -617,7 +617,7 @@ export class RealEasteNews implements BaseService{
         // const list = item.map((val) => JSON.parse(val))
         // return list
         const pagegination = new Pagination(page, limit)
-        const item = await redis_client.HKEYS(`${user.id}:${`save`}`)
+        const item = await redis_client.HVALS(`${user.id}:${`save`}`)
         let output = []
         for (
             let index = pagegination.getOffset();
