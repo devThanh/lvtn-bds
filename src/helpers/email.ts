@@ -1,4 +1,5 @@
 import redis_client from '../../redis_connect'
+import { Payment } from '../modules/payment/entities/payment.model'
 
 const nodemailer = require('nodemailer')
 
@@ -74,11 +75,23 @@ export async function senMailerForgetPass(email: string, pass: string) {
     })
 }
 
-export async function senMailerApprove(email: string, real_easte_id: string, expiration: number, approval_date: string, name: string) {
+export async function senMailerApprove(email: string, real_easte_id: string, expiration: number, approval_date: string, name: string, payment: Payment) {
     mailOptions.to = email
     mailOptions.subject = `Hi ${name}`
     mailOptions.text = `THÔNG BÁO`
-    mailOptions.html = `<h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã được duyệt vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>`
+    mailOptions.html = `
+    <h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã được duyệt vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>
+    </br>
+    <h3>HÓA ĐƠN THANH TOÁN</h3>
+    </br>
+    <h5>Trạng thái: ${payment.status}</h5>
+    </br>
+    <h5>Thời gian: ${payment.created_date}</h5>
+    </br>
+    <h5>Mã giao dịch: ${payment.code_transaction}</h5>
+    </br>
+    <h5>Tổng phí: ${payment.price}</h5>
+    `
     await transporter.sendMail(mailOptions, async function (error, info) {
         if (error) {
             console.log(error)

@@ -145,7 +145,7 @@ export const senMailerDisapproveQueue = new Queue('senMailerDisapprove', {
 export const senMailerApproveWorker = new Worker(
     'senMailerApprove',
     async (job) => {
-        senMailerApprove(job.data.email, job.data.real_easte_id, job.data.expiration, job.data.approval_date, job.data.name)
+        senMailerApprove(job.data.email, job.data.real_easte_id, job.data.expiration, job.data.approval_date, job.data.name, job.data.payment)
     },
     {
         connection: {

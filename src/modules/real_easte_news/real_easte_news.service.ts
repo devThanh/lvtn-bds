@@ -27,6 +27,7 @@ import util from "../../util/util";
 import { Between, Like, getRepository } from "typeorm";
 import { title } from "process";
 import { it } from "node:test";
+import { Payment } from "../payment/entities/payment.model";
 moment.locale('vn')
 const dataSource = ConnectDB.AppDataSource
 
@@ -316,9 +317,10 @@ export class RealEasteNews implements BaseService{
                     { removeOnComplete: true, removeOnFail: true, delay:delay }
                 )
                 const user = await User.findOneBy({id: news.user})
+                const payment = await Payment.findOneBy({real_easte_id: news.id})
                 await senMailerApproveQueue.add(
                     'senMailerApprove',
-                    {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: news.approval_date, name: user.fullname},
+                    {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: news.approval_date, name: user.fullname, payment: payment},
                     {removeOnComplete: true, removeOnFail: true}
                 )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
@@ -598,7 +600,7 @@ export class RealEasteNews implements BaseService{
             //const news = await News.findOneBy({ id: newsId })
             if (news !== null && news.status === 'Release') {
                 const a = JSON.stringify(news)
-                redis_client.hSet(`${user.id}:${`save`}`, `${news.id}`, 1)
+                redis_client.hSet(`${user.id}:${`save`}`, `${news.id}`, JSON.stringify(news))
                 //30days = 2592000s
                 //redis_client.expire(`${email}:${`save`}`, 2592000)
                 return { message: 'Save this news successfully!!!' }
