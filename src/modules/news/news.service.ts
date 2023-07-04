@@ -39,7 +39,7 @@ export class NewsService implements BaseService{
                 Body: thumbnail.buffer
             };
             news.thumbnail=filename
-                //const data = await s3Client.send(new PutObjectCommand(bucketParams));
+                const data = await s3Client.send(new PutObjectCommand(bucketParams));
                 console.log(
                   "Successfully uploaded object: " +
                     bucketParams.Bucket +
