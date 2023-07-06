@@ -95,9 +95,10 @@ export class PaymentService implements BaseService{
             payment.bank = vnp_Params['vnp_BankCode'].toString()
             payment.content = vnp_Params['vnp_OrderInfo'].toString() 
             payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
-            let d= Date.parse(vnp_Params['vnp_PayDate'].toString())
+            let d= vnp_Params['vnp_PayDate'].toString()
+            let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
             let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
-            payment.created_date = s
+            payment.created_date = ad
             payment.status = 'success'
             payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
             const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
@@ -115,9 +116,11 @@ export class PaymentService implements BaseService{
             payment.bank = vnp_Params['vnp_BankCode'].toString()
             payment.content = vnp_Params['vnp_OrderInfo'].toString() 
             payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
-            let d= Date.parse(vnp_Params['vnp_PayDate'].toString())
-            let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
-            payment.created_date = s
+            //let d= Date.parse(vnp_Params['vnp_PayDate'])
+            //let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
+            //let d = moment(vnp_Params['vnp_PayDate'].toString()).format('YYYY-MM-DD HH:mm:ss')
+            console.log(vnp_Params['vnp_PayDate'].toString());
+            payment.created_date = vnp_Params['vnp_PayDate'].toString()
             payment.status = 'fail'
             payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
             const real_easte_id = vnp_Params['vnp_TxnRef'].toString()

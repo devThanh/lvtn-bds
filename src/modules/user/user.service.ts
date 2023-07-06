@@ -125,9 +125,10 @@ export class UserService implements BaseService{
                     redis_client.hSet( `${users.email}:${`refresh-token`}`,refreshToken,1)
                     redis_client.expire(`${users.email}:${`refresh-token`}`,7776000)
                     const imageName = users.avatar
+                    let img: string = ''
                     if(users.avatar!==null){
 
-                        users.avatar = await getSignedUrl(
+                        img = await getSignedUrl(
                             s3Client,
                             new GetObjectCommand({
                               Bucket: "lvtn-bds",
@@ -140,7 +141,7 @@ export class UserService implements BaseService{
                         "id" : users.id,
                         "email": users.email,
                         "fullname": users.fullname,
-                        "avatar": users.avatar,
+                        "avatar": img,
                         "dateOfBirth": users.dateOfBirth,
                         "phone": users.phone,
                         "address": users.address,

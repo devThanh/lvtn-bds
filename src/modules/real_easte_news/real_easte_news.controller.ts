@@ -224,4 +224,57 @@ export class RealEasteNewsController{
             next(error)
         }
     }
+
+    statistical = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            console.log(req.body.start);
+            const result = await this.realEasteNewsService.statistical(req.body.start, req.body.end,req.email)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    unsave= async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.unsave(req.email, req.type,req.params.real_easte_id)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    getNewsUserSeen= async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const page = Pagination.fromReq(req)
+        try {
+            const result = await this.realEasteNewsService.getNewsUserSeen(req.email, req.type,page.page, page.limit)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    getNewsHidden=async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const page = Pagination.fromReq(req)
+        try {
+            const result = await this.realEasteNewsService.getNewsHidden(req.email)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    restore=async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.realEasteNewsService.restore(req.params.id, req.email)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
 }

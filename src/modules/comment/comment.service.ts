@@ -10,6 +10,7 @@ import moment from "moment";
 import { Liked } from "./entities/like.model";
 import { Pagination } from "../../helpers/response.wrapper";
 import { Info_Real_Easte } from "../real_easte_news/entities/info_real_easte.model";
+import { it } from "node:test";
 moment.locale('vn')
 const dataSource = ConnectDB.AppDataSource
 
@@ -34,6 +35,7 @@ export class CommentService implements BaseService{
         const info = await Info_Real_Easte.findOneBy({id: real_easte_detail_id})
         if(info===null)throw Errors.BadRequest
         else{
+            console.log(countComment.length);
             if (countComment.length === 0 && user!==null) {
                 const comment = new Comment()
                 comment.real_easte_id = real_easte_detail_id
@@ -75,6 +77,13 @@ export class CommentService implements BaseService{
         const user = await User.findOneBy({email: email, type: type})
         const comment = await Comment.findOneBy({ id: commentId, parent_comment: null, user_id: user.id })
         if(comment!==null){
+            const listReply = await Comment.find({where:{parent_comment: comment.id}})
+            const res = await Promise.all(
+                listReply.map(async(item)=>{
+                    console.log(item);
+                    await item.remove()
+                })
+            )
             await comment.remove()
             return {message:'Xoa thanh cong'}
         }else throw Errors.NotFound

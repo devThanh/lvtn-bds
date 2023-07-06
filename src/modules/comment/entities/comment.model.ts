@@ -19,7 +19,7 @@ export class Comment extends BaseEntity{
     @Column()
     real_easte_id!: string
 
-    @Column({nullable: true})
+    @Column({nullable: true, default: null})
     parent_comment: string
 
 

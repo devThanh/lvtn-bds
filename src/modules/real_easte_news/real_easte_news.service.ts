@@ -144,10 +144,12 @@ export class RealEasteNews implements BaseService{
             const admin = await Admin.findOneBy({email: email})
             const user = await User.findOneBy({email: email, type: typeUser})
             if((result!==null && admin!== null) || (result!==null && user.id===result.user)){
-                result.deleted = true
-                await result.save()
+                // result.deleted = true
+                // await result.save()
+                await result.remove()
                 const user = await User.findOneBy({id: result.user})
                 redis_client.hDel(`${user.email}:${`real-estate-news`}`, result.id)
+                redis_client.hDel(`${`real-estate-news`}`,result.id)
                 return {message:'Delete successfully!!'}
             } else throw Errors.NotFound
         } catch (error) {
@@ -531,8 +533,17 @@ export class RealEasteNews implements BaseService{
         const news = await Real_Easte_News.findOneBy({slug: info.real_easte_id})
         const image = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
         const user = await User.findOneBy({id: info.user})
+        user.avatar =  await getSignedUrl(
+            s3Client,
+            new GetObjectCommand({
+              Bucket: "lvtn-bds",
+              Key: user.avatar
+            }),
+            { expiresIn: 3600 }// 60*60 seconds
+          )
         console.log(info);
         if(info!==null){
+            redis_client.hSet(`${user.email}:${`isSeenRE`}`, `${news.id}`, JSON.stringify(news))
             Object.getOwnPropertyNames(info.location).forEach(key => {
                 let value = info.location[key];
                 console.log(value);
@@ -692,6 +703,7 @@ export class RealEasteNews implements BaseService{
             news.status = 'Release'
             const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
             news.updated_date = date
+            news.created_date
             await news.save()
             const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
@@ -709,6 +721,90 @@ export class RealEasteNews implements BaseService{
                     {removeOnComplete: true, removeOnFail: true}
                 )
         }else throw Errors.BadRequest
+    }
+
+    statistical =async (start: string, end: string, user: string) => {
+        const admin = await Admin.findOneBy({email: user})
+        if(admin!==null){
+            const newsRepository =  dataSource.getRepository(Real_Easte_News)
+            const paymentRepository =  dataSource.getRepository(Payment)
+            const news = await newsRepository.createQueryBuilder('news')
+                                                .where('news.created_date >:start',{start})
+                                                .andWhere('news.created_date <=:end',{end})
+                                                .getManyAndCount()
+            
+            const payment = await paymentRepository.createQueryBuilder('payment')
+                                                    .select('COUNT(price)', 'totalSale')
+                                                    .where('payment.created_date >:start',{start})
+                                                    .andWhere('payment.created_date <=:end',{end})
+                                                    .execute()
+            return {news, payment}
+        }else throw Errors.Unauthorized
+        
+    }
+
+    unsave = async (email:string, type: string, real_easte_id: string) => {
+        const user = await User.findOneBy({email: email, type: type})
+        const redisSearch = await redis_client.hGet(
+            `${user.id}:${`save`}`,
+            `${real_easte_id}`
+        )
+        if (redisSearch) {
+            let news: Real_Easte_News = JSON.parse(redisSearch)
+            redis_client.HDEL(`${user.id}:${`save`}`, `${news.id}`)
+            //return { message: 'You are already save this news' }
+        } else {
+            throw Errors.NotFound
+        }
+    }
+
+    getNewsUserSeen =async (email: string, type: string, page:number, limit: number) => {
+        const user = await User.findOneBy({email: email, type: type})
+        // const listNewsSaved = await redis_client.HKEYS(`${email}:${`save`}`)
+        // let output = []
+        // console.log('first: ', email, listNewsSaved)
+        // const item = await redis_client.HVALS(`${email}:${`save`}`)
+        // const list = item.map((val) => JSON.parse(val))
+        // return list
+        const pagegination = new Pagination(page, limit)
+        const item = await redis_client.HVALS(`${user.email}:${`isSeenRE`}`)
+        let output = []
+        for (
+            let index = pagegination.getOffset();
+            index < pagegination.getOffset() + limit && index < item.length;
+            index++
+        ) {
+            output.push(JSON.parse(item[index]))
+        }
+        //const list = item.map((val) => JSON.parse(val))
+        if (output.length === 0) throw Errors.NotFound
+        return output
+    }
+
+    getNewsHidden=async (email:string) => {
+        const admin = await Admin.findOneBy({email:email})
+        if(admin!==null){
+            const news = await Real_Easte_News.find({where:{deleted: true}})
+            if(news!==null){
+                return news
+            }else throw Errors.NotFound
+        }else throw Errors.Unauthorized
+    }
+
+    restore= async (id: string, email: string) => {
+        try {  
+            const result = await Real_Easte_News.findOneBy({id: id})
+            const admin = await Admin.findOneBy({email: email})
+            //const user = await User.findOneBy({email: email, type: typeUser})
+            if(result!==null && admin!==null){
+                result.deleted = false
+                await result.save()
+                return {message:'Restore successfully!!'}
+            } else throw Errors.NotFound
+        } catch (error) {
+            console.log(error);
+            throw Errors.BadRequest
+        }
     }
 
 }

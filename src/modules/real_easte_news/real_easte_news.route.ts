@@ -16,10 +16,14 @@ const realEasteNewsController = new RealEasteNewsController(realEasteNewsService
 
 realEasteRouter.put('/re-post/:slug', authMiddleware.authorize, realEasteNewsController.rePost)
 realEasteRouter.get('/news-user', authMiddleware.authorize, realEasteNewsController.getNewsByUser)
+realEasteRouter.get('/user-seen', authMiddleware.authorize, realEasteNewsController.getNewsUserSeen)
+realEasteRouter.get('/get-hidden', authMiddleware.authorize, realEasteNewsController.getNewsHidden)
 realEasteRouter.get('/get-disapprove', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/get-news', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/search', realEasteNewsController.search)
+realEasteRouter.get('/statistical', realEasteNewsController.statistical)
 realEasteRouter.post('/save/:real_easte_id', authMiddleware.authorize, realEasteNewsController.save)
+realEasteRouter.post('/unsave/:real_easte_id', authMiddleware.authorize, realEasteNewsController.unsave)
 realEasteRouter.get('/get-saved', authMiddleware.authorize, realEasteNewsController.getSave)
 realEasteRouter.get('/detail/:slug', realEasteNewsController.detailInfoRealEaste)
 realEasteRouter.post('/create-info', upload.array('images',10), authMiddleware.authorize, realEasteNewsController.infoRealEaste)
@@ -29,6 +33,7 @@ realEasteRouter.put('/approve/:id', authMiddleware.authorize, realEasteNewsContr
 realEasteRouter.get('/:slug', realEasteNewsController.getByCategory)
 realEasteRouter.delete('/delete/:id', authMiddleware.authorize, realEasteNewsController.deleteRealEasteNews)
 realEasteRouter.put('/hidden/:id', authMiddleware.authorize, realEasteNewsController.hiddenRealEasteNews)
+realEasteRouter.put('/restore/:id', authMiddleware.authorize, realEasteNewsController.restore)
 realEasteRouter.put('/edit/:id', authMiddleware.authorize, upload.single('thumbnail'), realEasteNewsMiddleware.validateEdit, realEasteNewsController.editRealEasteNews)
 realEasteRouter.post('/create', authMiddleware.authorize, upload.single('thumbnail'), realEasteNewsMiddleware.validatePost, realEasteNewsController.postRealEasteNews)
 

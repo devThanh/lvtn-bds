@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import redis_client, { emailQueue } from "../../../redis_connect";
@@ -67,6 +67,19 @@ export class NewsService implements BaseService{
             if(admin!==null){
                 if(result!==null){
                     //result.deleted = true
+                    // const deleteParams = {
+                    //     Bucket: "lvtn-bds",
+                    //     Key: result.thumbnail,
+                    //     //Body: thumbnail.buffer
+                    // }
+                    
+                    // const data = await s3Client.send(new DeleteObjectCommand(deleteParams))
+                    // console.log(
+                    //     "Successfully uploaded object: " +
+                    //     deleteParams.Bucket +
+                    //       "/" +
+                    //       deleteParams.Key
+                    //   );
                     await result.remove()
                     //const user = await User.findOneBy({id: result.user})
                     redis_client.hDel(`${`news:`}${result.author}`, `${result.id}`)           
