@@ -734,10 +734,10 @@ export class RealEasteNews implements BaseService{
                                                 .getManyAndCount()
             
             const payment = await paymentRepository.createQueryBuilder('payment')
-                                                    .select('COUNT(price)', 'totalSale')
+                                                    .select('SUM(price)', 'totalSale')
                                                     .where('payment.created_date >:start',{start})
                                                     .andWhere('payment.created_date <=:end',{end})
-                                                    .execute()
+                                                    .getRawOne()
             return {news, payment}
         }else throw Errors.Unauthorized
         
