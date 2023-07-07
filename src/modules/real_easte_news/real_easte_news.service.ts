@@ -733,11 +733,16 @@ export class RealEasteNews implements BaseService{
                                                 .andWhere('news.created_date <=:end',{end})
                                                 .getManyAndCount()
             
-            const {payment} = await paymentRepository.createQueryBuilder('payment')
-                                                    .select('SUM(payment.price)', 'totalSale')
-                                                    .where('payment.created_date >:start',{start})
-                                                    .andWhere('payment.created_date <=:end',{end})
-                                                    .getRawOne()
+            // const {payment} = await paymentRepository.createQueryBuilder('payment')
+            //                                         .addSelect('SUM(payment.price)', 'totalSale')
+            //                                         .where('payment.created_date >:start',{start})
+            //                                         .andWhere('payment.created_date <=:end',{end})
+            //                                         .getRawOne()
+            const payment = await dataSource
+                                    .getRepository(Payment)
+                                    .createQueryBuilder("payment")
+                                    .addSelect("SUM(payment.price)", "totalSale")
+                                    .getRawMany()
             return {news, payment}
         }else throw Errors.Unauthorized
         
