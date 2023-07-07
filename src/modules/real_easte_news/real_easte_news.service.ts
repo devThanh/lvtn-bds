@@ -738,11 +738,8 @@ export class RealEasteNews implements BaseService{
             //                                         .where('payment.created_date >:start',{start})
             //                                         .andWhere('payment.created_date <=:end',{end})
             //                                         .getRawOne()
-            const payment = await dataSource
-                                    .getRepository(Payment)
-                                    .createQueryBuilder("payment")
-                                    .addSelect("SUM(payment.price)", "totalSale")
-                                    .getRawMany()
+            const payment = await dataSource.query(`select sum(price::NUMERIC) as totalSale from payment`)
+                                    
             return {news, payment}
         }else throw Errors.Unauthorized
         
