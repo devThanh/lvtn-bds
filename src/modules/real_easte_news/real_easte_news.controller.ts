@@ -227,8 +227,8 @@ export class RealEasteNewsController{
 
     statistical = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            console.log(req.body.start);
-            const result = await this.realEasteNewsService.statistical(req.body.start, req.body.end,req.email)
+            console.log(req.params.start);
+            const result = await this.realEasteNewsService.statistical(req.params.start, req.params.end,req.email)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             console.log(error);
