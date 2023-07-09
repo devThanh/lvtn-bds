@@ -5,7 +5,7 @@ import bcrypt from "../util/bcrypt";
 import { authService } from "../service";
 const GoogleStrategy = passportGoogle.Strategy;
 const FacebookStrategy  = require('passport-facebook').Strategy
-
+let data:Object = {}
 
 // GOOGLE LOGIN
 passport.use(
@@ -31,7 +31,7 @@ passport.use(
         accessToken:accesstoken
         refreshToken:refreshtoken
         const res = await newUser.save()
-        let data ={
+        data ={
           "id":res.id,
           "email":res.email,
           "fullname":res.fullname,
@@ -53,14 +53,14 @@ passport.use(
 );
 
 passport.serializeUser(function(user, done){
-  console.log('TSTSTS: ', user)
-    done(null, user)
+  console.log('TSTSTS: ', data)
+    done(null, data)
 })
 
 
 passport.deserializeUser(function(user, done){
-  console.log('TSTSTS: ', user)
-    done(null, user)
+  console.log('TSTSTS: ', data)
+    done(null, data)
 })
 
 
@@ -103,7 +103,7 @@ async function(request, accessToken, refreshToken, profile, done) {
         refreshToken:refreshtoken
         const res = await newUser.save()
         console.log(res)
-        let data ={
+        data ={
           "id":res.id,
           "email":res.email,
           "fullname":res.fullname,
@@ -123,12 +123,12 @@ async function(request, accessToken, refreshToken, profile, done) {
 ));
 
 passport.serializeUser(function(user, done){
-  console.log(user)
-  done(null, user)
+  console.log(data)
+  done(null, data)
 })
 
 
 passport.deserializeUser(function(user, done){
-  console.log(user)
-  done(null, user)
+  console.log(data)
+  done(null, data)
 })
