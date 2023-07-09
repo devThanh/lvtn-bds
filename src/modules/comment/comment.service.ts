@@ -11,6 +11,9 @@ import { Liked } from "./entities/like.model";
 import { Pagination } from "../../helpers/response.wrapper";
 import { Info_Real_Easte } from "../real_easte_news/entities/info_real_easte.model";
 import { it } from "node:test";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { s3Client } from "../../helpers/s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 moment.locale('vn')
 const dataSource = ConnectDB.AppDataSource
 
@@ -330,6 +333,7 @@ export class CommentService implements BaseService{
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
         const orderExp = `comment.${column}`
+        const arr: Array<Object> = []
         //const listNews = await News.find({ take: limit, skip: offset })
         const commentRepository = dataSource.getRepository(Comment)
         const commentList = await commentRepository
@@ -345,7 +349,25 @@ export class CommentService implements BaseService{
             .getMany()
             console.log(commentList);
         if (commentList.length != 0) {
-            return commentList
+            commentList.map(async (item) => {
+                const user = await User.findOneBy({id: item.user_id})
+                user.avatar = await getSignedUrl(
+                    s3Client,
+                    new GetObjectCommand({
+                      Bucket: "lvtn-bds",
+                      Key: user.avatar
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                  )
+                const obj = {
+                    User: user,
+                    Comment: commentList,
+                    //ReplyComment: replyList,
+                }
+                arr.push(obj)
+            })
+            
+            return arr
         }else
         throw Errors.NotFound
     }
@@ -358,6 +380,7 @@ export class CommentService implements BaseService{
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
         const commentRepository = dataSource.getRepository(Comment)
+        const arr: Array<Object> = []
         const commentList = await commentRepository
             .createQueryBuilder('comment')
             .where('comment.parent_comment = :commentId', { commentId })
@@ -365,7 +388,27 @@ export class CommentService implements BaseService{
             .offset(offset)
             .getManyAndCount()
 
-        if (commentList[1] !== 0) return commentList[0]
+        if (commentList[1] !== 0){
+            commentList[0].map(async (item) => {
+                const user = await User.findOneBy({id: item.user_id})
+                user.avatar = await getSignedUrl(
+                    s3Client,
+                    new GetObjectCommand({
+                      Bucket: "lvtn-bds",
+                      Key: user.avatar
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                  )
+                const obj = {
+                    User: user,
+                    Comment: commentList,
+                    //ReplyComment: replyList,
+                }
+                arr.push(obj)
+            })
+            
+            return arr
+        } //return commentList[0]
         throw Errors.NotFound
     }
 
