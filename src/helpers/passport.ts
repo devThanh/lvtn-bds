@@ -45,7 +45,7 @@ passport.use(
       }else
       //let user = new User()
         //console.log(accessToken, newUser)
-        return done(null, user)
+        return done(null, {user, accesstoken,refreshtoken})
       // get profile details
       // save profile details in db
     }
@@ -114,12 +114,14 @@ async function(request, accessToken, refreshToken, profile, done) {
           "refreshToken":refreshtoken
         }
         return done(null, {data})
-      }else
+      }else{
+        return done(null, {user, accesstoken,refreshtoken})
+      }
+      }
   // User.findOrCreate({ googleId: profile.id }, function (err, user) {
   //   return done(err, user);
   // });
-      return done(null, user)
-}
+        
 ));
 
 passport.serializeUser(function(user, done){
