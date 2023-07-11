@@ -276,7 +276,8 @@ export class RealEasteNews implements BaseService{
                         "phone":user.phone,
                         "approve_date": element.approval_date,
                         "name": user.fullname,
-                        "slug": element.slug
+                        "slug": element.slug,
+                        "type": element.type
                     }
                     //console.log(element)
                     //res.push(element)
