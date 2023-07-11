@@ -347,7 +347,7 @@ export class RealEasteNews implements BaseService{
                 const d = new Date(news.approval_date);
                 const res = await addDay.addDay(d, Number(news.expiration))
                 news.expiration_date =   moment(res).format('YYYY-MM-DD HH:mm:ss')
-                news.admin = email
+                news.admin = admin.id
                 const a = await news.save()
                 
                 //const delays = Number(news.expiration)  * 60 * 60 * 24
