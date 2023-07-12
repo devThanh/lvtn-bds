@@ -407,12 +407,13 @@ export class RealEasteNews implements BaseService{
             if(category!== null){
                 const news = await Real_Easte_News.find({where:{category: category.name}})
                 if(news.length!==0){
+                    throw Errors.CanNotDelete
+                    
+                }else {
                     // category.name = name
                     // category.type = type
                     await category.remove()
                     return {message: 'Delete successfully!!'}
-                }else {
-                    throw Errors.CanNotDelete
                 }              
             }else throw Errors.NotFound
         }else throw Errors.Unauthorized
