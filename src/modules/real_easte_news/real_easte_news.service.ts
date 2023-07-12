@@ -405,7 +405,7 @@ export class RealEasteNews implements BaseService{
         const category = await Category.findOneBy({id: id})
         if(admin !== null){
             if(category!== null){
-                const news = await Real_Easte_News.find({where:{category: category.name}})
+                const news = await Real_Easte_News.find({where:{category: category.slug}})
                 if(news.length!==0){
                     throw Errors.CanNotDelete
                     
