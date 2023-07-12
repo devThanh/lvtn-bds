@@ -405,10 +405,15 @@ export class RealEasteNews implements BaseService{
         const category = await Category.findOneBy({id: id})
         if(admin !== null){
             if(category!== null){
-                // category.name = name
-                // category.type = type
-                await category.remove()
-                return {message: 'Delete successfully!!'}
+                const news = await Real_Easte_News.find({where:{category: category.name}})
+                if(news.length!==0){
+                    // category.name = name
+                    // category.type = type
+                    await category.remove()
+                    return {message: 'Delete successfully!!'}
+                }else {
+                    throw Errors.CanNotDelete
+                }              
             }else throw Errors.NotFound
         }else throw Errors.Unauthorized
 
@@ -665,9 +670,17 @@ export class RealEasteNews implements BaseService{
         const admin = await Admin.findOneBy({email: email})
         console.log(admin);
         if(admin!==null){
+            let arr: Array<Object>=[]
             const data = await Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
-            console.log(data);
-            return data
+            const res = Promise.all(
+                data.map(async(item)=>{
+                    const user = await User.findOneBy({id: item.user})
+                    arr.push({data, user})
+                })
+            )
+            
+            console.log(arr);
+            return arr
         }else throw Errors.Unauthorized
     }
 

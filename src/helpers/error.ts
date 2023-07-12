@@ -41,6 +41,7 @@ export const Errors = {
     VerifyCodeIsWrong: new ErrorResp('error.verifyCodeIsWrong','Verify Code Is Wrong', 400),
     InvalidRefreshToken: new ErrorResp('error.invalidRefreshToken','Invalid refresh token', 400),
     InvalidRequest: new ErrorResp('error.invalidRequest','Invalid request', 400),
+    CanNotDelete: new ErrorResp('error.canNotDelete','Can Not Delete', 400),
 }
 
 export const handleError = (err: Error, res: Response) => {
