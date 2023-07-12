@@ -98,7 +98,7 @@ export class PaymentService implements BaseService{
             let d= vnp_Params['vnp_PayDate'].toString()
             let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
             let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
-            payment.created_date = ad
+            payment.created_date = d
             payment.status = 'success'
             payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
             const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
