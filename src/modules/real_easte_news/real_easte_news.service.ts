@@ -612,16 +612,69 @@ export class RealEasteNews implements BaseService{
         //                              .createQueryBuilder('easte')
         //                              .where('easte.title like :title', {title: `%${search_query.title}%`})
         //                              .getMany()
-        const info = await Real_Easte_News.find({where:[{
+        const news = await Real_Easte_News.find({where:[{
             title: Like(`%${search_query.title}%`), status: 'Release'
         }]})
+        const res: Array<Object> = []
+        const data = await Promise.all(
+            news.map(async(element)=>{
+                const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
+                const user = await User.findOneBy({id: element.user})
+                user.avatar = await getSignedUrl(
+                    s3Client,
+                    new GetObjectCommand({
+                      Bucket: "lvtn-bds",
+                      Key: user.avatar
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                )
+                if(element.thumbnail!==''){
+
+                    const imageName = element.thumbnail
+                    element.thumbnail = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                          Bucket: "lvtn-bds",
+                          Key: imageName
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                    )
+                    const data = {
+                        "Real_Easte": element,
+                        "Info": info,
+                        "User": user
+                        // "id":element.id,
+                        // "title":element.title,
+                        // "content":element.content,
+                        // "thumbnail":element.thumbnail,
+                        // "price":info.price,
+                        // "acreage":info.acreage,
+                        // "number_bathrooms":info.number_bathrooms,
+                        // "number_bedrooms":info.number_bedrooms,
+                        // "district":info.district,
+                        // "city": info.city,
+                        // "email":user.email,
+                        // "phone":user.phone,
+                        // "approve_date": element.approval_date,
+                        // "name": user.fullname,
+                        // "slug": element.slug,
+                        // "type": element.type
+                    }
+                    //console.log(element)
+                    //res.push(element)
+                    res.push(data)
+                }
+            })
+        )
+        console.log("GBCT: ",res)
+        return res
         // const info = 
         // console.log(info);
         // await redis_client.ft.sugAdd(``,``,1)
         //const data = await redis_client.ft.search(`idx:real-easte-info`,`@title:6`)
         // console.log(data);
         //const data = await dataSource.query(`SELECT * FROM real_easte_news WHERE title LIKE $1`, ['N%' + search_query.title + '%'])
-        return info
+        //return info
     }
 
 
