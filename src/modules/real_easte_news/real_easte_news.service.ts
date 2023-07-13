@@ -146,6 +146,10 @@ export class RealEasteNews implements BaseService{
             if((result!==null && admin!== null) || (result!==null && user.id===result.user)){
                 // result.deleted = true
                 // await result.save()
+                const info = await Info_Real_Easte.findOneBy({real_easte_id: result.slug})
+                if(info!==null){
+                    await info.remove()
+                }else throw Errors.NotFound
                 await result.remove()
                 const user = await User.findOneBy({id: result.user})
                 redis_client.hDel(`${user.email}:${`real-estate-news`}`, result.id)
