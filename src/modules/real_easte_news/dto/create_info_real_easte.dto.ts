@@ -4,12 +4,12 @@ import { IsInt, IsNumber, IsString, Max, MaxLength, Min, isString } from "class-
 
 export class Create_Info_Real_Easte{
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     acreage: number
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     price: number
 
@@ -17,17 +17,17 @@ export class Create_Info_Real_Easte{
     // status: string
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     number_bedrooms: number
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     number_bathrooms: number
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     number_floors: number
 
@@ -40,12 +40,12 @@ export class Create_Info_Real_Easte{
     balcony_direction: string
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     facade: number
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     road_width: number
 
@@ -60,12 +60,12 @@ export class Create_Info_Real_Easte{
     // location: string
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     length: number
 
     @Expose()
-    @IsInt()
+    //@IsInt()
     @Min(1)
     width: number
 
