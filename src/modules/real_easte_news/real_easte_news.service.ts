@@ -697,10 +697,16 @@ export class RealEasteNews implements BaseService{
         if(admin!==null){
             let arr: Array<Object>=[]
             const data = await Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
+            console.log(data);
             const res = Promise.all(
                 data.map(async(item)=>{
                     const user = await User.findOneBy({id: item.user})
-                    arr.push({data, user})
+                    console.log(user);
+                    let obj = {
+                        "Real_Easte_News":item,
+                        "User":user
+                    }
+                    arr.push(obj)
                 })
             )
             
