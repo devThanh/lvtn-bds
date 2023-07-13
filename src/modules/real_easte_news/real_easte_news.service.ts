@@ -408,8 +408,9 @@ export class RealEasteNews implements BaseService{
         const category = await Category.findOneBy({id: cate_id})
         console.log(category);
         if(admin !== null){
+            const check = await Category.findOneBy({name: name, type: type})
             if(category!== null){
-                if(category.name === name){
+                if(category.name === name || check !== null){
                     throw Errors.BadRequest
                 }else{
                     category.name = name
