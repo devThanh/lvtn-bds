@@ -59,7 +59,7 @@ export class RealEasteNewsMiddleware{
         info.interior = req.body.interior
         info.length = req.body.length
         info.width = req.body.width
-        info.total_usable_area = req.body.total_usable_area
+        //info.total_usable_area = req.body.total_usable_area
         validate(info).then((errors)=>{
             if(errors.length > 0){
                 console.log('validation failed. errors: ', errors);

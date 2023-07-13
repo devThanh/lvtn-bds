@@ -69,9 +69,9 @@ export class Create_Info_Real_Easte{
     @Min(1)
     width: number
 
-    @Expose()
-    @IsInt()
-    @Min(1)
-    total_usable_area: string
+    // @Expose()
+    // @IsInt()
+    // @Min(1)
+    // total_usable_area: string
 }
 

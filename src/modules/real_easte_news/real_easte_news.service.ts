@@ -409,10 +409,14 @@ export class RealEasteNews implements BaseService{
         console.log(category);
         if(admin !== null){
             if(category!== null){
-                category.name = name
-                category.type = type
-                return await category.save()
-                //return {message: 'Delete successfully!!'}
+                if(category.name === name){
+                    throw Errors.BadRequest
+                }else{
+                    category.name = name
+                    category.type = type
+                    return await category.save()
+                    //return {message: 'Delete successfully!!'}
+                }               
             }else throw Errors.NotFound
         }else throw Errors.Unauthorized
 
