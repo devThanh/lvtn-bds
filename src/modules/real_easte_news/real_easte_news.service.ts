@@ -693,12 +693,13 @@ export class RealEasteNews implements BaseService{
         const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
         const admin = await Admin.findOneBy({email: email})
+        let arr: Array<Object>=[]
         console.log(admin);
         if(admin!==null){
-            let arr: Array<Object>=[]
+            
             const data = await Real_Easte_News.find({where:{status:''},skip:skip,take:limit})
             console.log(data);
-            const res = Promise.all(
+            const res = await Promise.all(
                 data.map(async(item)=>{
                     const user = await User.findOneBy({id: item.user})
                     console.log(user);
