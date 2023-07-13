@@ -254,6 +254,14 @@ export class RealEasteNews implements BaseService{
             news.map(async(element)=>{
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
                 const user = await User.findOneBy({id: element.user})
+                user.avatar = await getSignedUrl(
+                    s3Client,
+                    new GetObjectCommand({
+                      Bucket: "lvtn-bds",
+                      Key: user.avatar
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                )
                 if(element.thumbnail!==''){
 
                     const imageName = element.thumbnail
