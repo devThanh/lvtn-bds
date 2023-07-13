@@ -349,7 +349,7 @@ export class CommentService implements BaseService{
             .getMany()
             console.log(commentList);
         if (commentList.length != 0) {
-            const data = Promise.all(
+            const data = await Promise.all(
                 commentList.map(async (item) => {
                     const user = await User.findOneBy({id: item.user_id})
                     user.avatar = await getSignedUrl(
@@ -368,8 +368,8 @@ export class CommentService implements BaseService{
                     arr.push(obj)
                 })
             )
-            console.log("CMT LIST: ", arr);
-            return arr
+            console.log("CMT LIST: ", arr, data);
+            return data
         }else
         throw Errors.NotFound
     }
@@ -391,7 +391,7 @@ export class CommentService implements BaseService{
             .getManyAndCount()
 
         if (commentList[1] !== 0){
-            const data = Promise.all(
+            const data = await Promise.all(
                 commentList[0].map(async (item) => {
                     const user = await User.findOneBy({id: item.user_id})
                     user.avatar = await getSignedUrl(
@@ -410,8 +410,8 @@ export class CommentService implements BaseService{
                     arr.push(obj)
                 })
             )
-                console.log('LIST CMT REPLY: ', arr);
-                return arr
+                console.log('LIST CMT REPLY: ', arr, data);
+                return data
         } //return commentList[0]
         throw Errors.NotFound
     }
