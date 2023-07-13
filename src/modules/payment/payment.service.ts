@@ -95,10 +95,11 @@ export class PaymentService implements BaseService{
             payment.bank = vnp_Params['vnp_BankCode'].toString()
             payment.content = vnp_Params['vnp_OrderInfo'].toString() 
             payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
-            let d= vnp_Params['vnp_PayDate'].toString()
-            let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
-            let s = moment(d).format('DD/MM/YYYY HH:mm:ss')
-            payment.created_date = d
+            let s= vnp_Params['vnp_PayDate'].toString()
+            // let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
+            // let d = moment(d).format('DD/MM/YYYY HH:mm:ss')
+            let date = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} ${s.slice(8, 10)}:${s.slice(10,12)}:${s.slice(12,14)}`
+            payment.created_date = date
             payment.status = 'success'
             payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
             const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
