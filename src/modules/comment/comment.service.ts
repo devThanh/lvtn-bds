@@ -349,24 +349,26 @@ export class CommentService implements BaseService{
             .getMany()
             console.log(commentList);
         if (commentList.length != 0) {
-            commentList.map(async (item) => {
-                const user = await User.findOneBy({id: item.user_id})
-                user.avatar = await getSignedUrl(
-                    s3Client,
-                    new GetObjectCommand({
-                      Bucket: "lvtn-bds",
-                      Key: user.avatar
-                    }),
-                    { expiresIn: 3600 }// 60*60 seconds
-                  )
-                const obj = {
-                    User: user,
-                    Comment: commentList,
-                    //ReplyComment: replyList,
-                }
-                arr.push(obj)
-            })
-            
+            const data = Promise.all(
+                commentList.map(async (item) => {
+                    const user = await User.findOneBy({id: item.user_id})
+                    user.avatar = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                          Bucket: "lvtn-bds",
+                          Key: user.avatar
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                      )
+                    const obj = {
+                        User: user,
+                        Comment: commentList,
+                        //ReplyComment: replyList,
+                    }
+                    arr.push(obj)
+                })
+            )
+            console.log("CMT LIST: ", arr);
             return arr
         }else
         throw Errors.NotFound
@@ -389,25 +391,27 @@ export class CommentService implements BaseService{
             .getManyAndCount()
 
         if (commentList[1] !== 0){
-            commentList[0].map(async (item) => {
-                const user = await User.findOneBy({id: item.user_id})
-                user.avatar = await getSignedUrl(
-                    s3Client,
-                    new GetObjectCommand({
-                      Bucket: "lvtn-bds",
-                      Key: user.avatar
-                    }),
-                    { expiresIn: 3600 }// 60*60 seconds
-                  )
-                const obj = {
-                    User: user,
-                    Comment: commentList,
-                    //ReplyComment: replyList,
-                }
-                arr.push(obj)
-            })
-            
-            return arr
+            const data = Promise.all(
+                commentList[0].map(async (item) => {
+                    const user = await User.findOneBy({id: item.user_id})
+                    user.avatar = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                          Bucket: "lvtn-bds",
+                          Key: user.avatar
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                      )
+                    const obj = {
+                        User: user,
+                        Comment: commentList,
+                        //ReplyComment: replyList,
+                    }
+                    arr.push(obj)
+                })
+            )
+                console.log('LIST CMT REPLY: ', arr);
+                return arr
         } //return commentList[0]
         throw Errors.NotFound
     }
