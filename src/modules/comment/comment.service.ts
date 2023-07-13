@@ -360,9 +360,9 @@ export class CommentService implements BaseService{
                         }),
                         { expiresIn: 3600 }// 60*60 seconds
                       )
-                    const obj = {
+                    let obj = {
                         User: user,
-                        Comment: commentList,
+                        Comment: item,
                         //ReplyComment: replyList,
                     }
                     arr.push(obj)
@@ -392,7 +392,7 @@ export class CommentService implements BaseService{
             .getManyAndCount()
 
         if (commentList[1] !== 0){
-            const data = await Promise.all(
+            const data = Promise.all(
                 commentList[0].map(async (item) => {
                     const user = await User.findOneBy({id: item.user_id})
                     user.avatar = await getSignedUrl(
@@ -405,7 +405,7 @@ export class CommentService implements BaseService{
                       )
                     const obj = {
                         User: user,
-                        Comment: commentList,
+                        Comment: item,
                         //ReplyComment: replyList,
                     }
                     arr.push(obj)
