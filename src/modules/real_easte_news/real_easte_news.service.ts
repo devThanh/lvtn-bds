@@ -247,7 +247,7 @@ export class RealEasteNews implements BaseService{
     getByCategory = async (slug: string, page: number, limit: number) => {
         const pagegination = new Pagination(page, limit)
         const skip = pagegination.getOffset()
-        const news = await Real_Easte_News.find({select:['id', 'title', 'content', 'thumbnail', 'slug'],
+        const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release', category: slug}, skip:skip, take: limit})
         const res: Array<Object> = []
         const data = await Promise.all(
@@ -266,22 +266,25 @@ export class RealEasteNews implements BaseService{
                         { expiresIn: 3600 }// 60*60 seconds
                     )
                     const data = {
-                        "id":element.id,
-                        "title":element.title,
-                        "content":element.content,
-                        "thumbnail":element.thumbnail,
-                        "price":info.price,
-                        "acreage":info.acreage,
-                        "number_bathrooms":info.number_bathrooms,
-                        "number_bedrooms":info.number_bedrooms,
-                        "district":info.district,
-                        "city": info.city,
-                        "email":user.email,
-                        "phone":user.phone,
-                        "approve_date": element.approval_date,
-                        "name": user.fullname,
-                        "slug": element.slug,
-                        "type": element.type
+                        "Real_Easte": element,
+                        "Info": info,
+                        "User": user
+                        // "id":element.id,
+                        // "title":element.title,
+                        // "content":element.content,
+                        // "thumbnail":element.thumbnail,
+                        // "price":info.price,
+                        // "acreage":info.acreage,
+                        // "number_bathrooms":info.number_bathrooms,
+                        // "number_bedrooms":info.number_bedrooms,
+                        // "district":info.district,
+                        // "city": info.city,
+                        // "email":user.email,
+                        // "phone":user.phone,
+                        // "approve_date": element.approval_date,
+                        // "name": user.fullname,
+                        // "slug": element.slug,
+                        // "type": element.type
                     }
                     //console.log(element)
                     //res.push(element)
@@ -289,7 +292,7 @@ export class RealEasteNews implements BaseService{
                 }
             })
         )
-        console.log(res)
+        console.log("GBCT: ",res)
         return res
     }
 
