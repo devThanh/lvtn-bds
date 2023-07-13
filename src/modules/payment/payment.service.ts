@@ -107,8 +107,9 @@ export class PaymentService implements BaseService{
             await real.save()
             payment.user = user.id
             await payment.save()
-    
-            return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
+            let url: string = 'http://localhost:3000/thanh-toan-thanh-cong'
+            return url
+            //return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
         } else{
             let payment = new Payment()
             payment.id = vnp_Params['vnp_TransactionNo'].toString()

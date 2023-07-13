@@ -30,7 +30,8 @@ export class PaymentController{
     vnpayReturn = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const result = await this.paymentService.vnpayReturn(req.query,req.email, req.type)
-            res.send(new ResponseWrapper(result))
+            //res.send(new ResponseWrapper(result))
+            res.redirect('http://localhost:3000/thanh-toan-thanh-cong')
         } catch (error) {
             next(error)
         }
