@@ -390,12 +390,16 @@ export class RealEasteNews implements BaseService{
         const admin = await Admin.findOneBy({email: email})
         //const category = await Category.findOneBy({id: id})
         if(admin !== null){
-            const category = new Category()
-            category.name = name
-            category.type = type
-            return await category.save()
-
-        }else throw Errors.BadRequest
+            const check = await Category.findOneBy({name: name, type: type})
+            if(check!==null){
+                throw Errors.BadRequest
+            }else{
+                const category = new Category()
+                category.name = name
+                category.type = type
+                return await category.save()
+            }
+        }else throw Errors.Unauthorized
 
     }
 
@@ -420,8 +424,9 @@ export class RealEasteNews implements BaseService{
         const category = await Category.findOneBy({id: id})
         if(admin !== null){
             if(category!== null){
-                const news = await Real_Easte_News.find({where:{category: category.slug}})
-                if(news.length!==0){
+                const news = await Real_Easte_News.findOneBy({category: category.slug})
+                console.log('News Category: ', news);
+                if(news!==null){
                     throw Errors.CanNotDelete
                     
                 }else {
