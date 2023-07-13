@@ -333,7 +333,7 @@ export class CommentService implements BaseService{
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
         const orderExp = `comment.${column}`
-        const arr: Array<Object> = []
+        let arr: Array<Object> = []
         //const listNews = await News.find({ take: limit, skip: offset })
         const commentRepository = dataSource.getRepository(Comment)
         const commentList = await commentRepository
@@ -382,7 +382,7 @@ export class CommentService implements BaseService{
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
         const commentRepository = dataSource.getRepository(Comment)
-        const arr: Array<Object> = []
+        let arr: Array<Object> = []
         const commentList = await commentRepository
             .createQueryBuilder('comment')
             .where('comment.parent_comment = :commentId', { commentId })
