@@ -366,10 +366,11 @@ export class CommentService implements BaseService{
                         //ReplyComment: replyList,
                     }
                     arr.push(obj)
+                    console.log("object: ",arr);
                 })
             )
-            console.log("CMT LIST: ", arr, data);
-            return data
+            console.log("CMT LIST: ", arr);
+            return arr
         }else
         throw Errors.NotFound
     }
@@ -408,10 +409,11 @@ export class CommentService implements BaseService{
                         //ReplyComment: replyList,
                     }
                     arr.push(obj)
+                    console.log("object: ", arr);
                 })
             )
-                console.log('LIST CMT REPLY: ', arr, data);
-                return data
+                console.log('LIST CMT REPLY: ', arr);
+                return arr
         } //return commentList[0]
         throw Errors.NotFound
     }
