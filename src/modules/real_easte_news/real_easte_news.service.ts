@@ -381,7 +381,7 @@ export class RealEasteNews implements BaseService{
                     {removeOnComplete: true, removeOnFail: true}
                 )
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(a))
-                redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(admin))
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(a))
             }else throw Errors.NotFound
         }else throw Errors.Unauthorized
     }
