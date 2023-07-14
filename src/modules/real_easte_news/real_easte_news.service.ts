@@ -276,7 +276,7 @@ export class RealEasteNews implements BaseService{
                   }),
                   { expiresIn: 3600 }// 60*60 seconds
                 )
-                imgarr.push(img)
+                //imgarr.push(img)
             }
                 if(element.thumbnail!==''){
 
@@ -293,7 +293,7 @@ export class RealEasteNews implements BaseService{
                         "Real_Easte": element,
                         "Info": info,
                         "User": user,
-                        "Images": imgarr
+                        //"Images": imgarr
                         // "id":element.id,
                         // "title":element.title,
                         // "content":element.content,
@@ -658,7 +658,7 @@ export class RealEasteNews implements BaseService{
                     }),
                     { expiresIn: 3600 }// 60*60 seconds
                     )
-                    imgarr.push(img)
+                    //imgarr.push(img)
                 }
                 if(element.thumbnail!==''){
 
@@ -675,7 +675,7 @@ export class RealEasteNews implements BaseService{
                         "Real_Easte": element,
                         "Info": info,
                         "User": user,
-                        "Images": imgarr
+                        //"Images": imgarr
                     }
                     //console.log(element)
                     //res.push(element)
@@ -803,22 +803,22 @@ export class RealEasteNews implements BaseService{
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: a.slug})
                     const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
                     
-            for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
-                const imageName = img.images
-                img.images = await getSignedUrl(
-                  s3Client,
-                  new GetObjectCommand({
-                    Bucket: "lvtn-bds",
-                    Key: imageName
-                  }),
-                  { expiresIn: 3600 }// 60*60 seconds
-                )
-                imgarr.push(img)
-            }
+                    for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                        const imageName = img.images
+                        img.images = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: imageName
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
+                        //imgarr.push(img)
+                    }
                     let s ={
                         real_easte_news: a,
                         info_real_easte: info,
-                        images: imgarr
+                        //images: imgarr
                     }
                     kq.push(s)
                 })
