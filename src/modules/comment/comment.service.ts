@@ -392,7 +392,7 @@ export class CommentService implements BaseService{
             .getManyAndCount()
 
         if (commentList[1] !== 0){
-            const data = Promise.all(
+            const data = await Promise.all(
                 commentList[0].map(async (item) => {
                     const user = await User.findOneBy({id: item.user_id})
                     user.avatar = await getSignedUrl(
