@@ -68,6 +68,7 @@ export class RealEasteNews implements BaseService{
                     );
                     return await newsEaste.save()
             }else newsEaste.thumbnail = ''
+            //redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
             redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             redis_client.HSET(`${email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             return await newsEaste.save()
@@ -250,6 +251,7 @@ export class RealEasteNews implements BaseService{
         const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release', category: slug}, skip:skip, take: limit})
         const res: Array<Object> = []
+        const imgarr: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
@@ -262,6 +264,20 @@ export class RealEasteNews implements BaseService{
                     }),
                     { expiresIn: 3600 }// 60*60 seconds
                 )
+                const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+                //const imgarr: Array<Object> = []
+            for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                const imageName = img.images
+                img.images = await getSignedUrl(
+                  s3Client,
+                  new GetObjectCommand({
+                    Bucket: "lvtn-bds",
+                    Key: imageName
+                  }),
+                  { expiresIn: 3600 }// 60*60 seconds
+                )
+                imgarr.push(img)
+            }
                 if(element.thumbnail!==''){
 
                     const imageName = element.thumbnail
@@ -276,7 +292,8 @@ export class RealEasteNews implements BaseService{
                     const data = {
                         "Real_Easte": element,
                         "Info": info,
-                        "User": user
+                        "User": user,
+                        "Images": imgarr
                         // "id":element.id,
                         // "title":element.title,
                         // "content":element.content,
@@ -628,6 +645,20 @@ export class RealEasteNews implements BaseService{
                     }),
                     { expiresIn: 3600 }// 60*60 seconds
                 )
+                const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+                const imgarr: Array<Object> = []
+                for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                //const imageName = img.images
+                    img.images = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                        Bucket: "lvtn-bds",
+                        Key: img.images
+                    }),
+                    { expiresIn: 3600 }// 60*60 seconds
+                    )
+                    imgarr.push(img)
+                }
                 if(element.thumbnail!==''){
 
                     const imageName = element.thumbnail
@@ -642,23 +673,8 @@ export class RealEasteNews implements BaseService{
                     const data = {
                         "Real_Easte": element,
                         "Info": info,
-                        "User": user
-                        // "id":element.id,
-                        // "title":element.title,
-                        // "content":element.content,
-                        // "thumbnail":element.thumbnail,
-                        // "price":info.price,
-                        // "acreage":info.acreage,
-                        // "number_bathrooms":info.number_bathrooms,
-                        // "number_bedrooms":info.number_bedrooms,
-                        // "district":info.district,
-                        // "city": info.city,
-                        // "email":user.email,
-                        // "phone":user.phone,
-                        // "approve_date": element.approval_date,
-                        // "name": user.fullname,
-                        // "slug": element.slug,
-                        // "type": element.type
+                        "User": user,
+                        "Images": imgarr
                     }
                     //console.log(element)
                     //res.push(element)
@@ -723,6 +739,7 @@ export class RealEasteNews implements BaseService{
             index++
         ) {
             output.push(JSON.parse(item[index]))
+            console.log(output);
         }
         //const list = item.map((val) => JSON.parse(val))
         if (output.length === 0) throw Errors.NotFound
@@ -782,9 +799,24 @@ export class RealEasteNews implements BaseService{
                 data.map(async(item)=>{
                     const a = JSON.parse(item)
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: a.slug})
+                    const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+                    const imgarr: Array<Object> = []
+            for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                const imageName = img.images
+                img.images = await getSignedUrl(
+                  s3Client,
+                  new GetObjectCommand({
+                    Bucket: "lvtn-bds",
+                    Key: imageName
+                  }),
+                  { expiresIn: 3600 }// 60*60 seconds
+                )
+                imgarr.push(img)
+            }
                     let s ={
                         real_easte_news: a,
-                        info_real_easte: info
+                        info_real_easte: info,
+                        images: imgarr
                     }
                     kq.push(s)
                 })
@@ -877,6 +909,7 @@ export class RealEasteNews implements BaseService{
             index++
         ) {
             output.push(JSON.parse(item[index]))
+            console.log(output);
         }
         //const list = item.map((val) => JSON.parse(val))
         if (output.length === 0) throw Errors.NotFound
