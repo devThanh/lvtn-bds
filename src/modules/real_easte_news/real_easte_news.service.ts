@@ -632,7 +632,8 @@ export class RealEasteNews implements BaseService{
         const news = await Real_Easte_News.find({where:[{
             title: Like(`%${search_query.title}%`), status: 'Release'
         }]})
-        const res: Array<Object> = []
+        let res: Array<Object> = []
+        let imgarr: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
@@ -646,7 +647,7 @@ export class RealEasteNews implements BaseService{
                     { expiresIn: 3600 }// 60*60 seconds
                 )
                 const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
-                const imgarr: Array<Object> = []
+                
                 for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
                 //const imageName = img.images
                     img.images = await getSignedUrl(
@@ -795,12 +796,13 @@ export class RealEasteNews implements BaseService{
             const data = await redis_client.HVALS(`${user.email}:${`real-estate-news`}`)
             console.log(data);
             let kq: Array<Object> = []
+            let imgarr: Array<Object> = []
             const res = await Promise.all(
                 data.map(async(item)=>{
                     const a = JSON.parse(item)
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: a.slug})
                     const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
-                    const imgarr: Array<Object> = []
+                    
             for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
                 const imageName = img.images
                 img.images = await getSignedUrl(
