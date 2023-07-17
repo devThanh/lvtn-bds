@@ -752,6 +752,14 @@ export class RealEasteNews implements BaseService{
                     console.log(item);
                     //const a = JSON.parse(item)
                     //console.log(a);
+                    item.thumbnail = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: item.thumbnail
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: item.slug})
                     console.log("object: ", info);
                     const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
@@ -833,6 +841,14 @@ export class RealEasteNews implements BaseService{
             const res = await Promise.all(
                 data.map(async(item)=>{
                     const a = JSON.parse(item)
+                    a.thumbnail = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: a.thumbnail
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: a.slug})
                     const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
                     
@@ -931,14 +947,10 @@ export class RealEasteNews implements BaseService{
 
     getNewsUserSeen =async (email: string, type: string, page:number, limit: number) => {
         const user = await User.findOneBy({email: email, type: type})
-        // const listNewsSaved = await redis_client.HKEYS(`${email}:${`save`}`)
-        // let output = []
-        // console.log('first: ', email, listNewsSaved)
-        // const item = await redis_client.HVALS(`${email}:${`save`}`)
-        // const list = item.map((val) => JSON.parse(val))
-        // return list
+        console.log(user);
         const pagegination = new Pagination(page, limit)
         const item = await redis_client.HVALS(`${user.email}:${`isSeenRE`}`)
+        console.log(item);
         let output = []
         let kq: Array<Object> = []
         let imgarr: Array<Object> = []
@@ -947,6 +959,7 @@ export class RealEasteNews implements BaseService{
             index < pagegination.getOffset() + limit && index < item.length;
             index++
         ) {
+            console.log(item[index]);
             output.push(JSON.parse(item[index]))
             console.log(output);
         }
@@ -955,6 +968,15 @@ export class RealEasteNews implements BaseService{
         else{
             const res = await Promise.all(
                 output.map(async(item)=>{
+                    //const a = JSON.parse(item)
+                    item.thumbnail = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: item.thumbnail
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
                     //const a = JSON.parse(item)
                     const info = await Info_Real_Easte.findOneBy({real_easte_id: item.slug})
                     const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
