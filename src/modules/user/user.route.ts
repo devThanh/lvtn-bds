@@ -22,7 +22,7 @@ userRouter.get('/user/auth/failure', (req:Request, res: Response)=>{
     res.send('failure')
 })
 userRouter.get('/auth/success', (req:Request, res: Response)=>{
-    res.send('success')
+    //res.send('success')
     const a = req.user
     res.send(a)
 })
