@@ -41,7 +41,7 @@ passport.use(
           "accessToken":accesstoken,
           "refreshToken":refreshtoken
         }
-        return done(null, {data})
+        return done(null, data)
       }else
       //let user = new User()
         //console.log(accessToken, newUser)
@@ -53,14 +53,14 @@ passport.use(
 );
 
 passport.serializeUser(function(user, done){
-  console.log('TSTSTS: ', data)
-    done(null, data)
+  console.log('TSTSTS: ', user)
+    done(null, user)
 })
 
 
 passport.deserializeUser(function(user, done){
-  console.log('TSTSTS: ', data)
-    done(null, data)
+  console.log('TSTSTS: ', user)
+    done(null, user)
 })
 
 
@@ -113,7 +113,7 @@ async function(request, accessToken, refreshToken, profile, done) {
           "accessToken":accesstoken,
           "refreshToken":refreshtoken
         }
-        return done(null, {data})
+        return done(null, data)
       }else{
         return done(null, {user, accesstoken,refreshtoken})
       }
