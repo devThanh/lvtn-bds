@@ -17,21 +17,22 @@ const userController = new UserController(userService, authService)
 const userMiddleware = new UserMiddleware()
 
 userRouter.get('/user/auth/failure', (req:Request, res: Response)=>{
-    res.send('something wrong')
+    const a = req.user
+    res.send(a)
 })
 userRouter.get('/auth/success', (req:Request, res: Response)=>{
     res.send('success')
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
 userRouter.get('/google/callback',passport.authenticate('google',{
-    // successRedirect: '/user/auth/success',
+    successRedirect: '/user/auth/success',
     failureRedirect: '/user/auth/failure'
 }), (req: Request, res: Response)=>{res.send(req.user)}
 )
 
 userRouter.get('/facebook',passport.authenticate("facebook", {scope: ['email'],}));
 userRouter.get('/facebook/callback',passport.authenticate('facebook', {
-        //successRedirect: '/user/auth/success',
+        successRedirect: '/user/auth/success',
         failureRedirect: '/user/auth/failure'
     }), (req: Request, res: Response)=>{res.send(req.user)}
 )
