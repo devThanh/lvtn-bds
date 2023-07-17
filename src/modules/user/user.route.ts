@@ -17,11 +17,14 @@ const userController = new UserController(userService, authService)
 const userMiddleware = new UserMiddleware()
 
 userRouter.get('/user/auth/failure', (req:Request, res: Response)=>{
-    const a = req.user
-    res.send(a)
+    // const a = req.user
+    // res.send(a)
+    res.send('failure')
 })
 userRouter.get('/auth/success', (req:Request, res: Response)=>{
     res.send('success')
+    const a = req.user
+    res.send(a)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
 userRouter.get('/google/callback',passport.authenticate('google',{
