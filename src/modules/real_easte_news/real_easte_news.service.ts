@@ -68,9 +68,8 @@ export class RealEasteNews implements BaseService{
                     );
                     return await newsEaste.save()
             }else newsEaste.thumbnail = ''
-            //redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id, JSON.stringify(news))
             redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            redis_client.HSET(`${email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
+            redis_client.HSET(`${user.email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             return await newsEaste.save()
             
         } catch (error) {
@@ -841,6 +840,7 @@ export class RealEasteNews implements BaseService{
             const res = await Promise.all(
                 data.map(async(item)=>{
                     const a = JSON.parse(item)
+                    console.log(a);
                     a.thumbnail = await getSignedUrl(
                         s3Client,
                         new GetObjectCommand({
