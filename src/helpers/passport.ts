@@ -125,12 +125,12 @@ async function(request, accessToken, refreshToken, profile, done) {
 ));
 
 passport.serializeUser(function(user, done){
-  console.log(data)
-  done(null, data)
+  console.log(user)
+  done(null, user)
 })
 
 
 passport.deserializeUser(function(user, done){
-  console.log(data)
-  done(null, data)
+  console.log(user)
+  done(null, user)
 })
