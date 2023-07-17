@@ -276,7 +276,7 @@ export class RealEasteNews implements BaseService{
                   }),
                   { expiresIn: 3600 }// 60*60 seconds
                 )
-                //imgarr.push(img)
+                imgarr.push(img)
             }
                 if(element.thumbnail!==''){
 
@@ -293,7 +293,7 @@ export class RealEasteNews implements BaseService{
                         "Real_Easte": element,
                         "Info": info,
                         "User": user,
-                        //"Images": imgarr
+                        "Images": imgarr
                         // "id":element.id,
                         // "title":element.title,
                         // "content":element.content,
@@ -675,7 +675,7 @@ export class RealEasteNews implements BaseService{
                         "Real_Easte": element,
                         "Info": info,
                         "User": user,
-                        //"Images": imgarr
+                        "Images": imgarr
                     }
                     //console.log(element)
                     //res.push(element)
@@ -733,18 +733,51 @@ export class RealEasteNews implements BaseService{
         // return list
         const pagegination = new Pagination(page, limit)
         const item = await redis_client.HVALS(`${user.id}:${`save`}`)
+        console.log("123213: ",item);
         let output = []
+        let kq: Array<Object> = []
+        let imgarr: Array<Object> = []
         for (
             let index = pagegination.getOffset();
             index < pagegination.getOffset() + limit && index < item.length;
             index++
         ) {
-            output.push(JSON.parse(item[index]))
-            console.log(output);
-        }
+            output.push(JSON.parse(item[index]))        }
         //const list = item.map((val) => JSON.parse(val))
         if (output.length === 0) throw Errors.NotFound
-        return output
+        else{
+            console.log('sssss: ',output[0]);
+            const res = await Promise.all(
+                output.map(async(item)=>{
+                    console.log(item);
+                    //const a = JSON.parse(item)
+                    //console.log(a);
+                    const info = await Info_Real_Easte.findOneBy({real_easte_id: item.slug})
+                    console.log("object: ", info);
+                    const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+                    
+                    for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                        const imageName = img.images
+                        img.images = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: imageName
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
+                        imgarr.push(img)
+                    }
+                    let s ={
+                        real_easte_news: item,
+                        info_real_easte: info,
+                        images: imgarr
+                    }
+                    kq.push(s)
+                })
+            )
+        }
+        return  kq
         // if(listNewsSaved){
     }
 
@@ -813,16 +846,17 @@ export class RealEasteNews implements BaseService{
                         }),
                         { expiresIn: 3600 }// 60*60 seconds
                         )
-                        //imgarr.push(img)
+                        imgarr.push(img)
                     }
                     let s ={
                         real_easte_news: a,
                         info_real_easte: info,
-                        //images: imgarr
+                        images: imgarr
                     }
                     kq.push(s)
                 })
             )
+            console.log("object: ", res);
             return kq
         }else throw Errors.NotFound
     }
@@ -863,9 +897,10 @@ export class RealEasteNews implements BaseService{
             const newsRepository =  dataSource.getRepository(Real_Easte_News)
             const paymentRepository =  dataSource.getRepository(Payment)
             const news = await newsRepository.createQueryBuilder('news')
-                                                .where('news.created_date >:start',{start})
+                                                .where('news.created_date >=:start',{start})
                                                 .andWhere('news.created_date <=:end',{end})
                                                 .getManyAndCount()
+                                                console.log(news);
             
             // const {payment} = await paymentRepository.createQueryBuilder('payment')
             //                                         .addSelect('SUM(payment.price)', 'totalSale')
@@ -905,6 +940,8 @@ export class RealEasteNews implements BaseService{
         const pagegination = new Pagination(page, limit)
         const item = await redis_client.HVALS(`${user.email}:${`isSeenRE`}`)
         let output = []
+        let kq: Array<Object> = []
+        let imgarr: Array<Object> = []
         for (
             let index = pagegination.getOffset();
             index < pagegination.getOffset() + limit && index < item.length;
@@ -915,7 +952,35 @@ export class RealEasteNews implements BaseService{
         }
         //const list = item.map((val) => JSON.parse(val))
         if (output.length === 0) throw Errors.NotFound
-        return output
+        else{
+            const res = await Promise.all(
+                output.map(async(item)=>{
+                    //const a = JSON.parse(item)
+                    const info = await Info_Real_Easte.findOneBy({real_easte_id: item.slug})
+                    const imgInfo = await Image_Real_Easte.find({where:{real_easte_id: info.id}})
+                    
+                    for (let img of imgInfo) { // For each post, generate a signed URL and save it to the post object
+                        const imageName = img.images
+                        img.images = await getSignedUrl(
+                        s3Client,
+                        new GetObjectCommand({
+                            Bucket: "lvtn-bds",
+                            Key: imageName
+                        }),
+                        { expiresIn: 3600 }// 60*60 seconds
+                        )
+                        imgarr.push(img)
+                    }
+                    let s ={
+                        real_easte_news: item,
+                        info_real_easte: info,
+                        images: imgarr
+                    }
+                    kq.push(s)
+                })
+            )
+        }
+        return kq
     }
 
     getNewsHidden=async (email:string) => {

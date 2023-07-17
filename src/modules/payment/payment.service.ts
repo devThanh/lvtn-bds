@@ -108,7 +108,13 @@ export class PaymentService implements BaseService{
             await real.save()
             payment.user = user.id
             await payment.save()
-            let url: string = `http://localhost:3000/thanh-toan-thanh-cong?cost=${payment.price}&${payment.bank}&${payment.created_date}&${payment.code_transaction}`
+            let param = {}
+            param['cost'] = payment.price
+            param['bank'] = payment.bank
+            param['date'] = payment.created_date
+            param['code'] = payment.code_transaction
+            let url: string = 'http://localhost:3000/thanh-toan-thanh-cong'
+            url += '?' + querystring.stringify(param, { encode: false });
             return url
             //return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
         } else{

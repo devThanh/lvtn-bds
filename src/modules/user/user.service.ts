@@ -20,7 +20,7 @@ export class UserService implements BaseService{
     }
 
     register = async(email: string, password: string, fullname: string, dateOfBirth: string, address: string, phone: string, avatar: Express.Multer.File)=>{
-        const checkEmailExist = await User.findOneBy({ email: email, type:'' })
+        const checkEmailExist = await User.findOneBy({ email: email, type:''})
         if (checkEmailExist !== null) {
             return { message: 'Email already existed' }
         } else {
