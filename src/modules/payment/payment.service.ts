@@ -113,7 +113,7 @@ export class PaymentService implements BaseService{
             param['bank'] = payment.bank
             param['date'] = payment.created_date
             param['code'] = payment.code_transaction
-            let url: string = `http://localhost:3000/thanh-toan-thanh-cong${payment.price}/${payment.bank}/${payment.created_date}/${payment.code_transaction}`
+            let url: string = `http://localhost:3000/thanh-toan-thanh-cong/${payment.price}/${payment.bank}/${payment.created_date}/${payment.code_transaction}`
             //url += '?' + querystring.stringify(param, { encode: false });
             return url
             //return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
