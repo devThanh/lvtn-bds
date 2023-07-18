@@ -618,18 +618,18 @@ export class RealEasteNews implements BaseService{
         }
     }
 
-    searchRealEaste = async (search_query: any,page:number, limit:number) => {
+    searchRealEaste = async (search_query: string,page:number, limit:number) => {
         // console.log(search_query);
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
-        const price = util.price(search_query.price) 
-        const acreage = util.acreage(search_query.acreage)
+        //const price = util.price(search_query.price) 
+        //const acreage = util.acreage(search_query.acreage)
         // const info = await dataSource.getRepository(Real_Easte_News)
         //                              .createQueryBuilder('easte')
         //                              .where('easte.title like :title', {title: `%${search_query.title}%`})
         //                              .getMany()
         const news = await Real_Easte_News.find({where:[{
-            title: Like(`%${search_query.title}%`), status: 'Release'
+            title: Like(`%${search_query}%`), status: 'Release'
         }]})
         let res: Array<Object> = []
         let imgarr: Array<Object> = []

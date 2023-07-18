@@ -175,7 +175,7 @@ export class RealEasteNewsController{
         const page = Pagination.fromReq(req)
         //console.log('TTT: ',req.query);
         try {
-            const result = await this.realEasteNewsService.searchRealEaste(req.query, page.page, page.limit)
+            const result = await this.realEasteNewsService.searchRealEaste(req.params.query, page.page, page.limit)
             res.send(new ResponseWrapper(result))
         } catch (error) {
             next(error)

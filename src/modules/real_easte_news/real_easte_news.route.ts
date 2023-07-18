@@ -20,7 +20,7 @@ realEasteRouter.get('/user-seen', authMiddleware.authorize, realEasteNewsControl
 realEasteRouter.get('/get-hidden', authMiddleware.authorize, realEasteNewsController.getNewsHidden)
 realEasteRouter.get('/get-disapprove', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
 realEasteRouter.get('/get-news', authMiddleware.authorize, realEasteNewsController.getNewsToApprove)
-realEasteRouter.get('/search', realEasteNewsController.search)
+realEasteRouter.get('/search/:query', realEasteNewsController.search)
 realEasteRouter.post('/statistical', realEasteNewsController.statistical)
 realEasteRouter.post('/save/:real_easte_id', authMiddleware.authorize, realEasteNewsController.save)
 realEasteRouter.post('/unsave/:real_easte_id', authMiddleware.authorize, realEasteNewsController.unsave)
