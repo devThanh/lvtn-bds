@@ -24,6 +24,8 @@ userRouter.get('/user/auth/failure', (req:Request, res: Response)=>{
 userRouter.get('/auth/success', (req:Request, res: Response)=>{
     //res.send('success')
     const a = req.user
+    console.log(a);
+    res.render('http://localhost:3000/', req.user)
     res.send(a)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));

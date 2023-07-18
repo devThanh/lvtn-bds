@@ -96,6 +96,7 @@ async function(request, accessToken, refreshToken, profile, done) {
         newUser.email = profile.emails[0].value
         newUser.password =  await bcrypt.encode(profile.id)
         newUser.avatar = profile.photos[0].value
+        newUser.fullname = profile.displayName
         newUser.type = 'FB'
         newUser.isActive=true
         
