@@ -68,10 +68,10 @@ export class RealEasteNews implements BaseService{
                     );
                     return await newsEaste.save()
             }else newsEaste.thumbnail = ''
+            await newsEaste.save()
             redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
             redis_client.HSET(`${user.email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            return await newsEaste.save()
-            
+            return newsEaste
         } catch (error) {
             console.log(error);
             throw Errors.BadRequest
@@ -150,10 +150,11 @@ export class RealEasteNews implements BaseService{
                 if(info!==null){
                     await info.remove()
                 }else throw Errors.NotFound
-                await result.remove()
-                const user = await User.findOneBy({id: result.user})
-                redis_client.hDel(`${user.email}:${`real-estate-news`}`, result.id)
+                const usered = await User.findOneBy({id: result.user})
+                console.log(usered);
+                redis_client.hDel(`${usered.email}:${`real-estate-news`}`, result.id)
                 redis_client.hDel(`${`real-estate-news`}`,result.id)
+                await result.remove()
                 return {message:'Delete successfully!!'}
             } else throw Errors.NotFound
         } catch (error) {
