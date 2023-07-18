@@ -619,7 +619,7 @@ export class RealEasteNews implements BaseService{
         }
     }
 
-    searchRealEaste = async (search_query: string,page:number, limit:number) => {
+    searchRealEaste = async (search_query: any,page:number, limit:number) => {
         // console.log(search_query);
         const pagegination = new Pagination(page, limit)
         const offset = pagegination.getOffset()
@@ -630,7 +630,7 @@ export class RealEasteNews implements BaseService{
         //                              .where('easte.title like :title', {title: `%${search_query.title}%`})
         //                              .getMany()
         const news = await Real_Easte_News.find({where:[{
-            title: Like(`%${search_query}%`), status: 'Release'
+            title: Like(`%${search_query.query}%`), status: 'Release'
         }]})
         let res: Array<Object> = []
         let imgarr: Array<Object> = []
