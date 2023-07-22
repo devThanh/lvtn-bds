@@ -88,35 +88,70 @@ export class PaymentService implements BaseService{
         let hmac = crypto.createHmac("sha512", secretKey);
         let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");       
         if(secureHash === signed){
-            //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-            let payment = new Payment()
-            payment.id = vnp_Params['vnp_TransactionNo'].toString()
-            payment.price = vnp_Params['vnp_Amount'].toString()
-            payment.bank = vnp_Params['vnp_BankCode'].toString()
-            payment.content = vnp_Params['vnp_OrderInfo'].toString() 
-            payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
-            let s= vnp_Params['vnp_PayDate'].toString()
-            // let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
-            // let d = moment(d).format('DD/MM/YYYY HH:mm:ss')
-            let date = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} ${s.slice(8, 10)}:${s.slice(10,12)}:${s.slice(12,14)}`
-            payment.created_date = date
-            payment.status = 'success'
-            payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
             const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
-            let real = await Real_Easte_News.findOneBy({id: real_easte_id})
-            real.isPay = 'paid'
-            await real.save()
-            payment.user = user.id
-            await payment.save()
-            let param = {}
-            param['cost'] = payment.price
-            param['bank'] = payment.bank
-            param['date'] = payment.created_date
-            param['code'] = payment.code_transaction
-            let url: string = `http://localhost:3000/thanh-toan-thanh-cong/${payment.price}/${payment.bank}/${payment.created_date}/${payment.code_transaction}`
-            //url += '?' + querystring.stringify(param, { encode: false });
-            return url
-            //return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
+            const checkPayment = await Payment.findOneBy({real_easte_id: real_easte_id})
+            //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+            if(checkPayment!==null){
+                let payment = new Payment()
+                payment.id = vnp_Params['vnp_TransactionNo'].toString()
+                payment.price = vnp_Params['vnp_Amount'].toString()
+                payment.bank = vnp_Params['vnp_BankCode'].toString()
+                //payment.content = vnp_Params['vnp_OrderInfo'].toString() 
+                payment.content = `Gia hạn cho bài đăng `+ vnp_Params['vnp_TxnRef'].toString() 
+                payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
+                let s= vnp_Params['vnp_PayDate'].toString()
+                // let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
+                // let d = moment(d).format('DD/MM/YYYY HH:mm:ss')
+                let date = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} ${s.slice(8, 10)}:${s.slice(10,12)}:${s.slice(12,14)}`
+                payment.created_date = date
+                payment.status = 'success'
+                payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+                // const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+                let real = await Real_Easte_News.findOneBy({id: real_easte_id})
+                real.isPay = 'paid'
+                await real.save()
+                payment.user = user.id
+                await payment.save()
+                let param = {}
+                param['cost'] = payment.price
+                param['bank'] = payment.bank
+                param['date'] = payment.created_date
+                param['code'] = payment.code_transaction
+                let url: string = `http://localhost:3000/thanh-toan-thanh-cong/${payment.price}/${payment.bank}/${payment.created_date}/${payment.code_transaction}`
+                //url += '?' + querystring.stringify(param, { encode: false });
+                return url 
+            }else{
+                let payment = new Payment()
+                payment.id = vnp_Params['vnp_TransactionNo'].toString()
+                payment.price = vnp_Params['vnp_Amount'].toString()
+                payment.bank = vnp_Params['vnp_BankCode'].toString()
+                //payment.content = vnp_Params['vnp_OrderInfo'].toString() 
+                payment.content = `Thanh toán cho bài đăng `+ vnp_Params['vnp_TxnRef'].toString() 
+                payment.code_transaction = vnp_Params['vnp_TransactionNo'].toString()
+                let s= vnp_Params['vnp_PayDate'].toString()
+                // let ad = moment(d).zone('GMT+7').format('DD-MM-YYYY HH:mm')
+                // let d = moment(d).format('DD/MM/YYYY HH:mm:ss')
+                let date = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} ${s.slice(8, 10)}:${s.slice(10,12)}:${s.slice(12,14)}`
+                payment.created_date = date
+                payment.status = 'success'
+                payment.real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+                // const real_easte_id = vnp_Params['vnp_TxnRef'].toString()
+                let real = await Real_Easte_News.findOneBy({id: real_easte_id})
+                real.isPay = 'paid'
+                await real.save()
+                payment.user = user.id
+                await payment.save()
+                let param = {}
+                param['cost'] = payment.price
+                param['bank'] = payment.bank
+                param['date'] = payment.created_date
+                param['code'] = payment.code_transaction
+                let url: string = `http://localhost:3000/thanh-toan-thanh-cong/${payment.price}/${payment.bank}/${payment.created_date}/${payment.code_transaction}`
+                //url += '?' + querystring.stringify(param, { encode: false });
+                return url
+                //return({code: vnp_Params['vnp_ResponseCode'], message:'success', payment})
+            }
+            
         } else{
             let payment = new Payment()
             payment.id = vnp_Params['vnp_TransactionNo'].toString()

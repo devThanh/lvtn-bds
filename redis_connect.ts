@@ -1,14 +1,19 @@
+
 import { createClient } from 'redis'
 
-//const url =  process.env.REDIS_HOST || 'redis://localhost:6379' 
+const url =  process.env.REDIS_HOST || 'redis://localhost:6379' 
 //const url = 'redis://redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com:18699'
+// const redis_client = createClient({
+//     password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob',
+//     socket: {
+//         host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
+//         port: 18699
+//     }
+// });
 const redis_client = createClient({
-    password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob',
-    socket: {
-        host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699
-    }
+    url
 });
+
 
 
 
@@ -29,7 +34,7 @@ redis_client.on('ready', () => console.log('Redis Client Ready'))
 export default redis_client
 
 import { Queue, Worker  } from 'bullmq'
-import { senMailer, senMailerApprove, senMailerDisapprove, senMailerForgetPass, senMailerRePost } from './src/helpers/email'
+import { senMailer, senMailerApprove, senMailerDisapprove, senMailerForgetPass, senMailerRePost, senMailerRepost } from './src/helpers/email'
 import { RealEasteNews } from './src/modules/real_easte_news/real_easte_news.service'
 import { Real_Easte_News } from './src/modules/real_easte_news/entities/real_easte_news.model'
 
@@ -81,11 +86,45 @@ export const expirationWorker = new Worker(
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
+
+export const repostQueue = new Queue('repost', {
+    connection: {
+        // host: 'localhost',
+        // port: 6379,
+        host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
+        port: 18699,
+        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+    },
+    defaultJobOptions: { removeOnComplete: true, removeOnFail: true },
+})
+
+export const repostWorker = new Worker(
+    'repost',
+    async (job) => {
+        // console.log(1);
+        // senMailerRepost(job.data.email, job.data.real_easte_id, job.data.expiration, job.data.approval_date, job.data.name, job.data.payment)
+        // console.log(2);
+        await util.repostRealEasteNews(job.data.id)
+        console.log(3);
+        console.log('',job.data.id);
+    },
+    {
+        connection: {
+            // host: 'localhost',
+            // port: 6379,
+            host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+        },
+    }
+)
+
+
 
 export const worker = new Worker(
     'Mailer',
@@ -97,8 +136,8 @@ export const worker = new Worker(
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
@@ -114,8 +153,8 @@ export const workerForgetPass = new Worker(
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
@@ -152,8 +191,8 @@ export const senMailerApproveWorker = new Worker(
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
@@ -168,29 +207,30 @@ export const senMailerDisapproveWorker = new Worker(
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
 
 export const senMailerRePostWorker = new Worker(
-    'senMailerRePost',
+    'mail-repost-real-easte-news',
     async (job) => {
         senMailerRePost(job.data.email, job.data.real_easte_id, job.data.expiration, job.data.approval_date, job.data.name)
+        await util.repostRealEasteNews(job.data.id)
     },
     {
         connection: {
             // host: 'localhost',
             // port: 6379,
             host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-        port: 18699,
-        password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
+            port: 18699,
+            password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob'
         },
     }
 )
 
-export const senMailerRePostQueue = new Queue('expiration-real-easte-news', {
+export const senMailerRePostQueue = new Queue('mail-repost-real-easte-news', {
     connection: {
         // host: 'localhost',
         // port: 6379,

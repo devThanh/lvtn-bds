@@ -104,6 +104,35 @@ export async function senMailerApprove(email: string, real_easte_id: string, exp
     })
 }
 
+export async function senMailerRepost(email: string, real_easte_id: string, expiration: number, approval_date: string, name: string, payment: Payment) {
+    mailOptions.to = email
+    mailOptions.subject = `Hi ${name}`
+    mailOptions.text = `THÔNG BÁO`
+    mailOptions.html = `
+    <h3>Cảm ơn bạn đã tin tưởng website sàn giao dịch bất động sản Thanh Build</h3> </br><p>Tin của bạn ( mã tin: ${real_easte_id} ) đã được gia hạn vào ngày ${approval_date} và sẽ hết hạn sau ${expiration} ngày. </br> Cảm ơn</p>
+    </br>
+    <h3>HÓA ĐƠN GIA HẠN</h3>
+    </br>
+    <h5>Trạng thái: ${payment.status}</h5>
+    </br>
+    <h5>Thời gian: ${payment.created_date}</h5>
+    </br>
+    <h5>Mã giao dịch: ${payment.code_transaction}</h5>
+    </br>
+    <h5>Tổng phí: ${payment.price}</h5>
+    `
+    await transporter.sendMail(mailOptions, async function (error, info) {
+        if (error) {
+            console.log(error)
+        } else {
+            console.log('Email sent: ' + info.response)
+            // await redis_client.hSet(`${email}:${`verifyCode`}`, `${random}`, 1)
+            // await redis_client.expire(`${email}:${`verifyCode`}`,15*60)
+            // do something useful
+        }
+    })
+}
+
 export async function senMailerDisapprove(email: string, real_easte_id: string, expiration: number, approval_date: string, name: string) {
     mailOptions.to = email
     mailOptions.subject = `Hi ${name}`

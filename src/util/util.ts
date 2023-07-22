@@ -16,6 +16,18 @@ export default{
         redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
         return news
     },
+
+    repostRealEasteNews: async (id: string) => {
+      console.log('SDSDDS: ',id);
+        const news = await Real_Easte_News.findOneBy({id: id})
+        const user = await User.findOneBy({id: news.user})
+        //news.status = 'Release'
+        const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+        news.expiration_date = date
+        await news.save()
+        return news
+    },
+
     sortObject: function sortObject(obj: Object) {
       let sorted = {};
       let str = [];

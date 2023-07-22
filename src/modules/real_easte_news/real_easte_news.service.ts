@@ -7,7 +7,7 @@ import { AuthService } from "../auth/auth.service";
 import { Real_Easte_News } from "./entities/real_easte_news.model";
 import { Errors } from "../../helpers/error";
 import { User } from "../user/entities/user.model";
-import redis_client, { emailQueue, expirationRealEasteNews, senMailerApproveQueue, senMailerDisapproveQueue, senMailerRePostQueue } from "../../../redis_connect";
+import redis_client, { emailQueue, expirationRealEasteNews, repostQueue, senMailerApproveQueue, senMailerDisapproveQueue, senMailerRePostQueue } from "../../../redis_connect";
 import { Admin } from "../user/entities/admin.model";
 import moment from 'moment';
 import { Pagination } from "../../helpers/response.wrapper";
@@ -342,7 +342,7 @@ export class RealEasteNews implements BaseService{
                 // news.expiration_date =   moment(res).format('YYYY-MM-DD HH:mm:ss')
                 news.admin = admin.id
                 await news.save()
-                
+                //const delay = 60*1000
                 const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
                 //const delay = 60*30*1000
@@ -881,30 +881,40 @@ export class RealEasteNews implements BaseService{
     reRelease =async (slug: string, type: number, expiration: number, email: string, userType: string) => {
         const user = await User.findOneBy({email: email, type: userType})
         if(user===null)throw Errors.Unauthorized
-        const news = await Real_Easte_News.findOneBy({slug: slug, status:'Expiration', user: user.id})
+        const news = await Real_Easte_News.findOneBy({slug: slug})
+        console.log(news);
         if(news !== null){
             news.type = type
             news.expiration = expiration
             news.status = 'Release'
             const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
             news.updated_date = date
-            news.created_date
+            //news.created_date
             await news.save()
             const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
                 //const delay = 60*30*1000
-                await expirationRealEasteNews.add(
-                    'expiration-real-easte-news',
-                    { id: news.id },
-                    { removeOnComplete: true, removeOnFail: true, delay:delay }
-                )
+                console.log("object",news);
+                // await repostQueue.add(
+                //     'repost',
+                //     { id: news.id },
+                //     { removeOnComplete: true, removeOnFail: true, delay:delay }
+                // )
                 //const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
                 //const user = await User.findOneBy({id: news.user})
                 await senMailerRePostQueue.add(
-                    'senMailerRePost',
+                    'mail-repost-real-easte-news',
                     {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: date, name: user.fullname},
                     {removeOnComplete: true, removeOnFail: true}
                 )
+                await senMailerRePostQueue.add(
+                    'repost',
+                    { id: news.id },
+                    {removeOnComplete: true, removeOnFail: true, delay: delay}
+                )
+                redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
+                return news
         }else throw Errors.BadRequest
     }
 
@@ -919,12 +929,13 @@ export class RealEasteNews implements BaseService{
                                                 .getManyAndCount()
                                                 console.log(news);
             
-            // const {payment} = await paymentRepository.createQueryBuilder('payment')
-            //                                         .addSelect('SUM(payment.price)', 'totalSale')
+            // const payment = await paymentRepository.createQueryBuilder('payment')
+            //                                         .addSelect('SUM(payment.price::NUMERIC)', 'totalSale')
             //                                         .where('payment.created_date >:start',{start})
             //                                         .andWhere('payment.created_date <=:end',{end})
             //                                         .getRawOne()
-            const payment = await dataSource.query(`select sum(price::NUMERIC) as totalSale from payment`)
+            //                                         console.log(payment);
+            const payment = await dataSource.query(`select sum(price::NUMERIC) as totalSale from payment where created_date >= '${start}' and created_date<= '${end}' group by id`)
                                     
             return {news, payment}
         }else throw Errors.Unauthorized
