@@ -1,18 +1,18 @@
 
 import { createClient } from 'redis'
 
-const url =  process.env.REDIS_HOST || 'redis://localhost:6379' 
+//const url =  process.env.REDIS_HOST || 'redis://localhost:6379' 
 //const url = 'redis://redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com:18699'
-// const redis_client = createClient({
-//     password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob',
-//     socket: {
-//         host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
-//         port: 18699
-//     }
-// });
 const redis_client = createClient({
-    url
+    password: 'GT8dxzSal6hw5nblaOGPzHmzXVWsf9Ob',
+    socket: {
+        host: 'redis-18699.c240.us-east-1-3.ec2.cloud.redislabs.com',
+        port: 18699
+    }
 });
+// const redis_client = createClient({
+//     url
+// });
 
 
 

@@ -345,7 +345,7 @@ export class RealEasteNews implements BaseService{
                 //const delay = 60*1000
                 const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
-                //const delay = 60*30*1000
+                //const delay = 60*1000
                 await expirationRealEasteNews.add(
                     'expiration-real-easte-news',
                     { id: id },
