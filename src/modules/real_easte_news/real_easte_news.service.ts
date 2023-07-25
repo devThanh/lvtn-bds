@@ -114,6 +114,8 @@ export class RealEasteNews implements BaseService{
                         );
                 }
                 //redis_client.HSET(`${}`,``,``)
+                redis_client.HSET(`${`real-estate-news`}`,result.id,JSON.stringify(result))
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`,result.id,JSON.stringify(result))
                 return await result.save()
             } else throw Errors.NotFound
         } catch (error) {
@@ -893,25 +895,19 @@ export class RealEasteNews implements BaseService{
             await news.save()
             const delay = Number(news.expiration)*60*60*24*1000
                 //console.log(delays);10000
-                //const delay = 60*30*1000
+            //const delay = 60*1000
                 console.log("object",news);
-                // await repostQueue.add(
-                //     'repost',
-                //     { id: news.id },
-                //     { removeOnComplete: true, removeOnFail: true, delay:delay }
-                // )
-                //const date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
-                //const user = await User.findOneBy({id: news.user})
+                await repostQueue.add(
+                    'repost',
+                    { id: news.id },
+                    {removeOnComplete: true, removeOnFail: true, delay: delay}
+                )
                 await senMailerRePostQueue.add(
                     'mail-repost-real-easte-news',
                     {email: user.email, real_easte_id: news.id, expiration: news.expiration, approval_date: date, name: user.fullname},
                     {removeOnComplete: true, removeOnFail: true}
                 )
-                await senMailerRePostQueue.add(
-                    'repost',
-                    { id: news.id },
-                    {removeOnComplete: true, removeOnFail: true, delay: delay}
-                )
+                
                 redis_client.HSET(`${`real-estate-news`}`,news.id,JSON.stringify(news))
                 redis_client.HSET(`${user.email}:${`real-estate-news`}`,news.id,JSON.stringify(news))
                 return news

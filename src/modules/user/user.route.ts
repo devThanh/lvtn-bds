@@ -27,13 +27,13 @@ userRouter.get('/auth/success', (req:Request, res: Response)=>{
     let b = a['user'].avatar.replaceAll('/','!')
     // console.log(a['user'].id, a['user'].fullname, b, a['refreshtoken'], a['accesstoken']);
     //res.render('http://localhost:3000/', req.user)
-     res.redirect(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
-    //res.send(req.user)
+    res.redirect(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
+    res.send(req.user)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
 userRouter.get('/google/callback',passport.authenticate('google',{
-    successRedirect: '/auth/success',
-    failureRedirect: '/auth/failure'
+    successRedirect: '/user/auth/success',
+    failureRedirect: '/user/auth/failure'
 }), (req: Request, res: Response)=>{res.send(req.user)}
 )
 

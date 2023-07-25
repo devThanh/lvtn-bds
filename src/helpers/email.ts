@@ -90,6 +90,8 @@ export async function senMailerApprove(email: string, real_easte_id: string, exp
     </br>
     <h5>Mã giao dịch: ${payment.code_transaction}</h5>
     </br>
+    <h5>Nội dung thanh toán: ${payment.content}</h5>
+    </br>
     <h5>Tổng phí: ${payment.price}</h5>
     `
     await transporter.sendMail(mailOptions, async function (error, info) {
@@ -118,6 +120,8 @@ export async function senMailerRepost(email: string, real_easte_id: string, expi
     <h5>Thời gian: ${payment.created_date}</h5>
     </br>
     <h5>Mã giao dịch: ${payment.code_transaction}</h5>
+    </br>
+    <h5>Nội dung thanh toán: ${payment.content}</h5>
     </br>
     <h5>Tổng phí: ${payment.price}</h5>
     `

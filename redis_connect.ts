@@ -217,7 +217,7 @@ export const senMailerRePostWorker = new Worker(
     'mail-repost-real-easte-news',
     async (job) => {
         senMailerRePost(job.data.email, job.data.real_easte_id, job.data.expiration, job.data.approval_date, job.data.name)
-        await util.repostRealEasteNews(job.data.id)
+        //await util.repostRealEasteNews(job.data.id)
     },
     {
         connection: {
