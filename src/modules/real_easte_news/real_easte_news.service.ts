@@ -66,12 +66,17 @@ export class RealEasteNews implements BaseService{
                         "/" +
                         bucketParams.Key
                     );
-                    return await newsEaste.save()
-            }else newsEaste.thumbnail = ''
-            await newsEaste.save()
-            redis_client.HSET(`${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            redis_client.HSET(`${user.email}:${`real-estate-news`}`,newsEaste.id,JSON.stringify(newsEaste))
-            return newsEaste
+                    const res = await newsEaste.save()
+                    redis_client.HSET(`${`real-estate-news`}`,res.id,JSON.stringify(res))
+                    redis_client.HSET(`${user.email}:${`real-estate-news`}`,res.id,JSON.stringify(res))
+                    return res
+            }else{
+                newsEaste.thumbnail = ''
+                const res = await newsEaste.save()
+                redis_client.HSET(`${`real-estate-news`}`,res.id,JSON.stringify(res))
+                redis_client.HSET(`${user.email}:${`real-estate-news`}`,res.id,JSON.stringify(res))
+                return res
+            } 
         } catch (error) {
             console.log(error);
             throw Errors.BadRequest
@@ -843,7 +848,7 @@ export class RealEasteNews implements BaseService{
             const res = await Promise.all(
                 data.map(async(item)=>{
                     const a = JSON.parse(item)
-                    console.log(a);
+                    console.log(a.content);
                     a.thumbnail = await getSignedUrl(
                         s3Client,
                         new GetObjectCommand({
@@ -875,7 +880,6 @@ export class RealEasteNews implements BaseService{
                     kq.push(s)
                 })
             )
-            console.log("object: ", res);
             return kq
         }else throw Errors.NotFound
     }

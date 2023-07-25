@@ -20,7 +20,7 @@ export class ConnectDB {
         password: process.env.DB_PASS,
         database: process.env.DB_NAME,
         entities: [User, Admin, News, Real_Easte_News, Category, Info_Real_Easte, Image_Real_Easte, Payment, Comment, Liked],
-        logging: true,
+        logging: false,
         synchronize: true,
         subscribers: [],
     })
