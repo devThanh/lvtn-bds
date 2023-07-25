@@ -16,6 +16,18 @@ const authMiddleware = new AuthMiddleware(authService)
 const userController = new UserController(userService, authService)
 const userMiddleware = new UserMiddleware()
 
+// userRouter.get('/fb-gg/:id/:name/:avatar/:accesstoken/:refreshtoken', (req: Request, res: Response)=>{
+//     let param = {
+//         'id': req.params.id,
+//         'fullname': req.params.name,
+//         'avatar': req.params.avatar,
+//         'accessToken': req.params.accesstoken,
+//         'refreshToken': req.params.refreshtoken
+//     }
+//     console.log("213123");
+//     res.send(param)
+// })
+
 userRouter.get('/auth/failure/', (req:Request, res: Response)=>{
     // const a = req.user
     // res.send(a)
@@ -26,13 +38,13 @@ userRouter.get('/auth/success/', (req:Request, res: Response)=>{
     const a = req.user
     let b = a['user'].avatar.replaceAll('/','!')
     req.user['user'].avatar = b
-    console.log("object");
+    // console.log("object");
     // console.log(a['user'].id, a['user'].fullname, b, a['refreshtoken'], a['accesstoken']);
     //res.render('http://localhost:3000/', req.user)
     //console.log(window.location.host);
     //res.send(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
-    res.redirect(`https://lvtn-bds.onrender.com/fb-gg/${a['user'].id}/${a['user'].fullname}/${req.user['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
-
+    //res.redirect(`https://lvtn-bds.onrender.com/fb-gg/${a['user'].id}/${a['user'].fullname}/${a['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
+    res.redirect(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${a['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
 userRouter.get('/google/callback',passport.authenticate('google',{
@@ -47,6 +59,7 @@ userRouter.get('/facebook/callback',passport.authenticate('facebook', {
         failureRedirect: '/user/auth/failure'
     }), (req: Request, res: Response)=>{res.send(req.user)}
 )
+
 userRouter.post('/sign-in',upload.single('avatar'), userMiddleware.validateSignIn,  userController.register)
 userRouter.get('/verify', userController.verify)
 userRouter.post('/login', userMiddleware.validateLogin, userController.login)
