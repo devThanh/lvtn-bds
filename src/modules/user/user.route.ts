@@ -16,20 +16,21 @@ const authMiddleware = new AuthMiddleware(authService)
 const userController = new UserController(userService, authService)
 const userMiddleware = new UserMiddleware()
 
-userRouter.get('/auth/failure', (req:Request, res: Response)=>{
+userRouter.get('/auth/failure/', (req:Request, res: Response)=>{
     // const a = req.user
     // res.send(a)
     res.send('failure')
 })
-userRouter.get('/auth/success', (req:Request, res: Response)=>{
+userRouter.get('/auth/success/', (req:Request, res: Response)=>{
     //res.send('success')
     const a = req.user
     let b = a['user'].avatar.replaceAll('/','!')
     console.log("object");
     // console.log(a['user'].id, a['user'].fullname, b, a['refreshtoken'], a['accesstoken']);
     //res.render('http://localhost:3000/', req.user)
-    res.redirect(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
-    //res.send(req.user)
+    //console.log(window.location.host);
+    //res.send(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
+    res.redirect(`https://lvtn-bds.onrender.com/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
 userRouter.get('/google/callback',passport.authenticate('google',{
