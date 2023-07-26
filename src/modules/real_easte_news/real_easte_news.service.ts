@@ -258,9 +258,10 @@ export class RealEasteNews implements BaseService{
         const news = await Real_Easte_News.find({
             where:{deleted: false, status: 'Release', category: slug}, skip:skip, take: limit})
         const res: Array<Object> = []
-        const imgarr: Array<Object> = []
+        // let imgarr: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
+                let imgarr: Array<Object> = []
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
                 const user = await User.findOneBy({id: element.user})
                 user.avatar = await getSignedUrl(
@@ -640,9 +641,10 @@ export class RealEasteNews implements BaseService{
             title: Like(`%${search_query.title}%`), status: 'Release'
         }]})
         let res: Array<Object> = []
-        let imgarr: Array<Object> = []
+        //let imgarr: Array<Object> = []
         const data = await Promise.all(
             news.map(async(element)=>{
+                let imgarr: Array<Object> = []
                 const info = await Info_Real_Easte.findOneBy({real_easte_id: element.slug})
                 const user = await User.findOneBy({id: element.user})
                 user.avatar = await getSignedUrl(
