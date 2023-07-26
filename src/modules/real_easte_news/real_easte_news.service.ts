@@ -665,7 +665,7 @@ export class RealEasteNews implements BaseService{
                     }),
                     { expiresIn: 3600 }// 60*60 seconds
                     )
-                    //imgarr.push(img)
+                    imgarr.push(img)
                 }
                 if(element.thumbnail!==''){
 
