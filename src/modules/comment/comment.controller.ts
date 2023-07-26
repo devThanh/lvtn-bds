@@ -133,5 +133,14 @@ export class CommentController{
         }
     }
 
+    getAllComment =async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const result = await this.commentService.getAllComment(req.email)
+            res.send(new ResponseWrapper(result))
+        } catch (error) {
+            next(error)
+        }
+    }
+
 
 }

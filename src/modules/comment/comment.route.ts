@@ -11,7 +11,7 @@ const commentService = new CommentService()
 const commentController = new CommentController(commentService, authService)
 export const commentRouter = express.Router()
 
-
+commentRouter.get('/get-all', authMiddleware.authorize, commentController.getAllComment)
 commentRouter.post('/create/:real_easte_detail_id', authMiddleware.authorize, commentController.createComment)
 commentRouter.put('/edit/:commentId', authMiddleware.authorize, commentController.editComment)
 commentRouter.put('/hidden-comment/:commentId', authMiddleware.authorize, commentController.hiddenComment)

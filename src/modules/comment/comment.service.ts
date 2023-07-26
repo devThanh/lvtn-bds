@@ -418,6 +418,27 @@ export class CommentService implements BaseService{
         throw Errors.NotFound
     }
 
+    getAllComment = async (email: string) =>{
+        const admin = await Admin.findOneBy({email:email})
+        let arr: Array<Object> = []
+        if(admin!==null){
+            const listComment = await Comment.find({})
+            const data = await Promise.all(
+                listComment.map(async (item) => {
+                    const user = await User.findOneBy({id: item.user_id})
+                    
+                    const obj = {
+                        User: user,
+                        Comment: item,
+                    }
+                    arr.push(obj)
+                    console.log("object: ", arr);
+                })
+            )
+            return arr
+        }else throw Errors.Unauthorized
+    }
+
     // listCommentByUser = async (email: string, page:number, limit:number, type: string) => {
     //     const pagegination = new Pagination(page, limit)
     //     const users = await User.findOneBy({email: email, type: type})

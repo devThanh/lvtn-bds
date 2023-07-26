@@ -37,13 +37,14 @@ userRouter.get('/auth/success/', (req:Request, res: Response)=>{
     //res.send('success')
     const a = req.user
     let b = a['user'].avatar.replaceAll('/','!')
-    req.user['user'].avatar = b
+    let c = b.replaceAll('?','|')
+    req.user['user'].avatar = c
     // console.log("object");
     // console.log(a['user'].id, a['user'].fullname, b, a['refreshtoken'], a['accesstoken']);
     //res.render('http://localhost:3000/', req.user)
     //console.log(window.location.host);
     //res.send(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${b}/${a['accesstoken']}/${a['refreshtoken']}`)
-    //res.redirect(`https://lvtn-bds.onrender.com/fb-gg/${a['user'].id}/${a['user'].fullname}/${a['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
+    //res.redirect(`https://lvtn-bds.onrender.com/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${a['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
     res.redirect(`http://localhost:3000/user/fb-gg/${a['user'].id}/${a['user'].fullname}/${a['user'].avatar}/${a['accesstoken']}/${a['refreshtoken']}`)
 })
 userRouter.get('/google',passport.authenticate("google", {scope: ["email", "profile"],}));
