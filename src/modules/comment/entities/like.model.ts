@@ -9,6 +9,6 @@ export class Liked extends BaseEntity{
     @Column('uuid')
     user_id: string
 
-    @Column()
+    @Column('uuid')
     commentId: string
 }

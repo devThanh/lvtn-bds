@@ -55,6 +55,7 @@ export class CommentController{
             const result = await this.commentService.hiddenComment(req.params.commentId, req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
+            console.log(error);
             next(error)
         }
     }
@@ -100,6 +101,7 @@ export class CommentController{
             const result = await this.commentService.like(req.params.commentId, req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
+            console.log(error);
             next(error)
         }
     }
@@ -109,6 +111,7 @@ export class CommentController{
             const result = await this.commentService.unlike(req.params.commentId, req.email, req.type)
             res.send(new ResponseWrapper(result))
         } catch (error) {
+            console.log(error);
             next(error)
         }
     }

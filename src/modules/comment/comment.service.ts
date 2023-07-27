@@ -96,16 +96,17 @@ export class CommentService implements BaseService{
     hiddenComment = async (commentId: string, email: string, type: string) => {
         try {
             const user = await User.findOneBy({email: email, type: type})
-            const admin = await Admin.findOneBy({email})
+            const admin = await Admin.findOneBy({email: email})
             const comment = await Comment.findOneBy({ id: commentId, parent_comment: null })
-            if (
-                (comment !== null && comment.user_id === user.id) || admin!== null) {
+            console.log(comment);
+            if ((comment !== null && admin!== null)) {
                 await Comment.softRemove(comment)
                 return { message: 'Hidden comment successfully' }
             } else {
                 return { message: 'Hidden comment failure' }
             }
         } catch (error) {
+            console.log(error);
             throw Errors.BadRequest
         }
     }
@@ -168,8 +169,7 @@ export class CommentService implements BaseService{
             const user = await User.findOneBy({email: email, type: type})
             const admin = await Admin.findOneBy({email})
             const comment = await Comment.findOneBy({ id: replycommentId })
-            if (
-                (comment !== null && comment.user_id === user.id) || admin!== null) {
+            if ((comment !== null &&  admin!== null)) {
                 await Comment.softRemove(comment)
                 return { message: 'Hidden comment successfully' }
             } else {
@@ -184,15 +184,16 @@ export class CommentService implements BaseService{
         const queryRunner = dataSource.createQueryRunner()
         await queryRunner.connect()
         const user = await User.findOneBy({email: email, type: type})
-        const comment = await Comment.findOneBy({ id: commentId, user_id: user.id })
+        const comment = await Comment.findOneBy({ id: commentId })
         await queryRunner.startTransaction()
         try {
             //if(comment.deletedDate !== null)return {message:'Your comment is hidden. Can not like'}
             const checkUserLiked = await Liked.find({
-                where: { user_id: user.id, commentId: comment.id },
+                where: { user_id: user.id, commentId: commentId },
             })
+            console.log(checkUserLiked);
             if (checkUserLiked.length === 0) {
-                comment.like+=1
+                comment.like = comment.like + 0 + 1
                 await comment.save()
                 // queryRunner.query(
                 //     `UPDATE comment SET comment.like = comment.like + 1 WHERE id = `,
@@ -209,6 +210,7 @@ export class CommentService implements BaseService{
                 return { message: 'You already like this comment' }
             }
         } catch (error) {
+            console.log(error);
             await queryRunner.rollbackTransaction()
             throw Errors.BadRequest
         } finally {
@@ -220,27 +222,27 @@ export class CommentService implements BaseService{
         const queryRunner = dataSource.createQueryRunner()
         await queryRunner.connect()
         const user = await User.findOneBy({email: email, type: type})
-        const comment = await Comment.findOneBy({ id: commentId, user_id: user.id })
+        const comment = await Comment.findOneBy({ id: commentId})
         await queryRunner.startTransaction()
         try {
             //if(comment.deletedDate !== null)return {message:'Your comment is hidden. Can not like'}
             const checkUserLiked = await Liked.find({
-                where: { user_id: user.id, commentId: comment.id },
+                where:{ user_id: user.id, commentId: commentId }
             })
-            console.log(checkUserLiked.length, user.id, comment.id);
+            console.log("checkUserLiked: ",comment);
             if (checkUserLiked.length !== 0) {
-                console.log("object");
+                // console.log("object");
                 comment.like-=1
                 await comment.save()
                 // queryRunner.query(
-                //     `UPDATE comment SET comment.like = comment.like - 1 WHERE id = `,
+                //     `UPDATE comment SET comment.like = comment.like - 1 WHERE id = $1`,
                 //     [commentId]
                 // )
                 // queryRunner.query(
-                //     'DELETE FROM liked WHERE email=? and commentId =',
-                //     [email, commentId]
+                //     'DELETE FROM liked WHERE user_id= $1 and commentId = $2',
+                //     [user.id, commentId]
                 // )
-                console.log(checkUserLiked);
+                // console.log(checkUserLiked);
                 checkUserLiked[0].remove()
                 await queryRunner.commitTransaction()
                 return { message: 'Unlike comment successfully' }
@@ -249,6 +251,7 @@ export class CommentService implements BaseService{
                 throw Errors.NotFound
             }
         } catch (error) {
+            console.log(error);
             await queryRunner.rollbackTransaction()
             return Errors.BadRequest
         } finally {

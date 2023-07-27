@@ -937,7 +937,7 @@ export class RealEasteNews implements BaseService{
             //                                         .andWhere('payment.created_date <=:end',{end})
             //                                         .getRawOne()
             //                                         console.log(payment);
-            const payment = await dataSource.query(`select sum(price::NUMERIC) as totalSale from payment where created_date >= '${start}' and created_date<= '${end}' group by id`)
+            const payment = await dataSource.query(`select sum(price::NUMERIC) as totalSale from payment where created_date >= '${start}' and created_date<= '${end}'`)
                                     
             return {news, payment}
         }else throw Errors.Unauthorized
